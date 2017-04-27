@@ -1,0 +1,902 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>33. The Second Level Cache &mdash; Doctrine 2 ORM 2 documentation</title>
+    <link rel="stylesheet" href="../src/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="../src/default.css" type="text/css" />
+    <link rel="stylesheet" href="../src/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../src/layout.css" type="text/css" />
+    <link rel="stylesheet" href="../src/configurationblock.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+
+    <script type="text/javascript" src="../src/jquery.js"></script>
+    <script type="text/javascript" src="../src/configurationblock.js"></script>
+    <script type="text/javascript" src="../src/underscore.js"></script>
+    <script type="text/javascript" src="../src/configurationblock.js"></script>
+    <script type="text/javascript" src="../src/doctools.js"></script>
+    <script type="text/javascript" src="../src/configurationblock.js"></script>
+    <script src="../src/bootstrap.min.js"></script>
+
+    <script type="text/javascript">
+    <!--
+        $(document).ready(function() {
+            $("#versions").change(function() {
+                var docsUrl = $(this).val();
+                window.location.href = docsUrl;
+            });
+        });
+    -->
+    </script>
+    <link rel="shortcut icon" href="../src/doctrine.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="top" title="Doctrine 2 ORM 2 documentation" href="../index.html" />
+    <link rel="next" title="34. Security" href="security.html" />
+    <link rel="prev" title="32. Advanced Configuration" href="advanced-configuration.html" /> 
+  
+<!-- RTD Extra Head -->
+
+<!-- 
+Always link to the latest version, as canonical.
+http://docs.readthedocs.org/en/latest/canonical.html
+-->
+<link rel="canonical" href="http://docs.doctrine-project.org/projects/doctrine-orm/en/latest/reference/second-level-cache.html" />
+
+<link rel="stylesheet" href="https://media.readthedocs.org/css/readthedocs-doc-embed.css" type="text/css" />
+
+<script type="text/javascript" src="../src/readthedocs-data.js"></script>
+
+<!-- Add page-specific data, which must exist in the page js, not global -->
+<script type="text/javascript">
+READTHEDOCS_DATA['page'] = 'reference/second-level-cache' 		
+READTHEDOCS_DATA['source_suffix'] = '.rst'
+</script>
+
+<script type="text/javascript" src="../src/readthedocs-dynamic-include.js"></script>
+
+<!-- end RTD <extrahead> --></head>
+  <body>
+    <div id="wrapper">
+      <div id="header">
+        <h1 id="h1title"></h1>
+        <div id="logo">
+          <a href="http://www.doctrine-project.org/">Doctrine - PHP Database Libraries</a>
+        </div>
+      </div>
+      <div id="nav" class="cls">
+        <div class="tl cls">
+          <ul>
+            <li><a target="_top" href="http://www.doctrine-project.org/">Home</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/about.html">About</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/projects.html">Projects</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/contribute.html">Contribute</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/community.html">Community</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/archive.html">Blog</a></li>
+            <li><a target="_top" href="http://www.doctrine-project.org/jira">Development</a></li>
+          </ul>
+        </div>
+      </div>
+      <div id="content" class="cls">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="security.html" title="34. Security"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="advanced-configuration.html" title="32. Advanced Configuration"
+             accesskey="P">previous</a> |</li>
+        <li><a href="/">Doctrine Homepage</a> &raquo;</li>
+        <li><a href="../index.html">Doctrine 2 ORM 2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+        <div class="document">
+            <div class="documentwrapper">
+                <div class="bodywrapper">
+
+              <div class="body" >
+                
+  <div class="section" id="the-second-level-cache">
+<h1>33. The Second Level Cache<a class="headerlink" href="#the-second-level-cache" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The second level cache functionality is marked as experimental for now. It
+is a very complex feature and we cannot guarantee yet that it works stable
+in all cases.</p>
+</div>
+<p>The Second Level Cache is designed to reduce the amount of necessary database access.
+It sits between your application and the database to avoid the number of database hits as much as possible.</p>
+<p>When turned on, entities will be first searched in cache and if they are not found,
+a database query will be fired and then the entity result will be stored in a cache provider.</p>
+<p>There are some flavors of caching available, but is better to cache read-only data.</p>
+<p>Be aware that caches are not aware of changes made to the persistent store by another application.
+They can, however, be configured to regularly expire cached data.</p>
+<div class="section" id="caching-regions">
+<h2>33.1. Caching Regions<a class="headerlink" href="#caching-regions" title="Permalink to this headline">¶</a></h2>
+<p>Second level cache does not store instances of an entity, instead it caches only entity identifier and values.
+Each entity class, collection association and query has its region, where values of each instance are stored.</p>
+<p>Caching Regions are specific region into the cache provider that might store entities, collection or queries.
+Each cache region resides in a specific cache namespace and has its own lifetime configuration.</p>
+<p>Notice that when caching collection and queries only identifiers are stored.
+The entity values will be stored in its own region</p>
+<p>Something like below for an entity region :</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="p">[</span>
+  <span class="s1">&#39;region_name:entity_1_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;FooBar&#39;</span><span class="p">,</span> <span class="s1">&#39;associationName&#39;</span><span class="o">=&gt;</span><span class="k">null</span><span class="p">],</span>
+  <span class="s1">&#39;region_name:entity_2_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="s1">&#39;associationName&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="o">=&gt;</span><span class="mi">11</span><span class="p">]],</span>
+  <span class="s1">&#39;region_name:entity_3_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="o">=&gt;</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="s1">&#39;associationName&#39;</span><span class="o">=&gt;</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="o">=&gt;</span><span class="mi">22</span><span class="p">]]</span>
+<span class="p">];</span>
+</pre></div>
+</div>
+<p>If the entity holds a collection that also needs to be cached.
+An collection region could look something like :</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="p">[</span>
+  <span class="s1">&#39;region_name:entity_1_coll_assoc_name_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;ownerId&#39;</span><span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]],</span>
+  <span class="s1">&#39;region_name:entity_2_coll_assoc_name_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;ownerId&#39;</span><span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]],</span>
+  <span class="s1">&#39;region_name:entity_3_coll_assoc_name_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;ownerId&#39;</span><span class="o">=&gt;</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="p">];</span>
+</pre></div>
+</div>
+<p>A query region might be something like :</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="p">[</span>
+  <span class="s1">&#39;region_name:query_1_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;list&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]],</span>
+  <span class="s1">&#39;region_name:query_2_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;list&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]],</span>
+  <span class="s1">&#39;region_name:query_3_hash&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="s1">&#39;list&#39;</span> <span class="o">=&gt;</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="p">];</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The following data structures represents now the cache will looks like, this is not actual cached data.</p>
+</div>
+</div>
+<div class="section" id="cache-regions">
+<span id="reference-second-level-cache-regions"></span><h2>33.2. Cache Regions<a class="headerlink" href="#cache-regions" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><code class="docutils literal"><span class="pre">Doctrine\ORM\Cache\Region\DefaultRegion</span></code> It&#8217;s the default implementation.</dt>
+<dd>A simplest cache region compatible with all doctrine-cache drivers but does not support locking.</dd>
+</dl>
+<p><code class="docutils literal"><span class="pre">Doctrine\ORM\Cache\Region</span></code> and <code class="docutils literal"><span class="pre">Doctrine\ORM\Cache\ConcurrentRegion</span></code>
+Defines contracts that should be implemented by a cache provider.</p>
+<p>It allows you to provide your own cache implementation that might take advantage of specific cache driver.</p>
+<p>If you want to support locking for <code class="docutils literal"><span class="pre">READ_WRITE</span></code> strategies you should implement <code class="docutils literal"><span class="pre">ConcurrentRegion</span></code>; <code class="docutils literal"><span class="pre">CacheRegion</span></code> otherwise.</p>
+<div class="section" id="cache-region">
+<h3>33.2.1. Cache region<a class="headerlink" href="#cache-region" title="Permalink to this headline">¶</a></h3>
+<p>Defines a contract for accessing a particular region.</p>
+<p><code class="docutils literal"><span class="pre">Doctrine\ORM\Cache\Region</span></code></p>
+<p>Defines a contract for accessing a particular cache region.</p>
+<p><a class="reference external" href="http://www.doctrine-project.org/api/orm/2.5/class-Doctrine.ORM.Cache.Region.html/">See API Doc</a>.</p>
+</div>
+<div class="section" id="concurrent-cache-region">
+<h3>33.2.2. Concurrent cache region<a class="headerlink" href="#concurrent-cache-region" title="Permalink to this headline">¶</a></h3>
+<p>A <code class="docutils literal"><span class="pre">Doctrine\ORM\Cache\ConcurrentRegion</span></code> is designed to store concurrently managed data region.
+By default, Doctrine provides a very simple implementation based on file locks <code class="docutils literal"><span class="pre">Doctrine\ORM\Cache\Region\FileLockRegion</span></code>.</p>
+<p>If you want to use an <code class="docutils literal"><span class="pre">READ_WRITE</span></code> cache, you should consider providing your own cache region.</p>
+<p><code class="docutils literal"><span class="pre">Doctrine\ORM\Cache\ConcurrentRegion</span></code></p>
+<p>Defines contract for concurrently managed data region.</p>
+<p><a class="reference external" href="http://www.doctrine-project.org/api/orm/2.5/class-Doctrine.ORM.Cache.ConcurrentRegion.html/">See API Doc</a>.</p>
+</div>
+<div class="section" id="timestamp-region">
+<h3>33.2.3. Timestamp region<a class="headerlink" href="#timestamp-region" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">Doctrine\ORM\Cache\TimestampRegion</span></code></p>
+<p>Tracks the timestamps of the most recent updates to particular entity.</p>
+<p><a class="reference external" href="http://www.doctrine-project.org/api/orm/2.5/class-Doctrine.ORM.Cache.TimestampRegion.html/">See API Doc</a>.</p>
+</div>
+</div>
+<div class="section" id="caching-mode">
+<span id="reference-second-level-cache-mode"></span><h2>33.3. Caching mode<a class="headerlink" href="#caching-mode" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">READ_ONLY</span></code> (DEFAULT)<ul>
+<li>Can do reads, inserts and deletes, cannot perform updates or employ any locks.</li>
+<li>Useful for data that is read frequently but never updated.</li>
+<li>Best performer.</li>
+<li>It is Simple.</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">NONSTRICT_READ_WRITE</span></code><ul>
+<li>Read Write Cache doesn’t employ any locks but can do reads, inserts, updates and deletes.</li>
+<li>Good if the application needs to update data rarely.</li>
+</ul>
+</li>
+<li><code class="docutils literal"><span class="pre">READ_WRITE</span></code><ul>
+<li>Read Write cache employs locks before update/delete.</li>
+<li>Use if data needs to be updated.</li>
+<li>Slowest strategy.</li>
+<li>To use it a the cache region implementation must support locking.</li>
+</ul>
+</li>
+</ul>
+<div class="section" id="built-in-cached-persisters">
+<h3>33.3.1. Built-in cached persisters<a class="headerlink" href="#built-in-cached-persisters" title="Permalink to this headline">¶</a></h3>
+<p>Cached persisters are responsible to access cache regions.</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Cache Usage</th>
+<th class="head">Persister</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>READ_ONLY</td>
+<td>Doctrine\ORM\Cache\Persister\Entity\ReadOnlyCachedEntityPersister</td>
+</tr>
+<tr class="row-odd"><td>READ_WRITE</td>
+<td>Doctrine\ORM\Cache\Persister\Entity\ReadWriteCachedEntityPersister</td>
+</tr>
+<tr class="row-even"><td>NONSTRICT_READ_WRITE</td>
+<td>Doctrine\ORM\Cache\Persister\Entity\NonStrictReadWriteCachedEntityPersister</td>
+</tr>
+<tr class="row-odd"><td>READ_ONLY</td>
+<td>Doctrine\ORM\Cache\Persister\Collection\ReadOnlyCachedCollectionPersister</td>
+</tr>
+<tr class="row-even"><td>READ_WRITE</td>
+<td>Doctrine\ORM\Cache\Persister\Collection\ReadWriteCachedCollectionPersister</td>
+</tr>
+<tr class="row-odd"><td>NONSTRICT_READ_WRITE</td>
+<td>Doctrine\ORM\Cache\Persister\Collection\NonStrictReadWriteCachedCollectionPersister</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>33.4. Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Doctrine allows you to specify configurations and some points of extension for the second-level-cache</p>
+<div class="section" id="enable-second-level-cache">
+<h3>33.4.1. Enable Second Level Cache<a class="headerlink" href="#enable-second-level-cache" title="Permalink to this headline">¶</a></h3>
+<p>To enable the second-level-cache, you should provide a cache factory
+<code class="docutils literal"><span class="pre">\Doctrine\ORM\Cache\DefaultCacheFactory</span></code> is the default implementation.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="cm">/* @var $config \Doctrine\ORM\Cache\RegionsConfiguration */</span>
+<span class="cm">/* @var $cache \Doctrine\Common\Cache\Cache */</span>
+
+<span class="nv">$factory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Doctrine\ORM\Cache\DefaultCacheFactory</span><span class="p">(</span><span class="nv">$config</span><span class="p">,</span> <span class="nv">$cache</span><span class="p">);</span>
+
+<span class="c1">// Enable second-level-cache</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">setSecondLevelCacheEnabled</span><span class="p">();</span>
+
+<span class="c1">// Cache factory</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">getSecondLevelCacheConfiguration</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">setCacheFactory</span><span class="p">(</span><span class="nv">$factory</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cache-factory">
+<h3>33.4.2. Cache Factory<a class="headerlink" href="#cache-factory" title="Permalink to this headline">¶</a></h3>
+<p>Cache Factory is the main point of extension.</p>
+<p>It allows you to provide a specific implementation of the following components :</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">QueryCache</span></code> Store and retrieve query cache results.</li>
+<li><code class="docutils literal"><span class="pre">CachedEntityPersister</span></code> Store and retrieve entity results.</li>
+<li><code class="docutils literal"><span class="pre">CachedCollectionPersister</span></code> Store and retrieve query results.</li>
+<li><code class="docutils literal"><span class="pre">EntityHydrator</span></code>  Transform an entity into a cache entry and cache entry into entities</li>
+<li><code class="docutils literal"><span class="pre">CollectionHydrator</span></code> Transform a collection into a cache entry and cache entry into collection</li>
+</ul>
+<p><a class="reference external" href="http://www.doctrine-project.org/api/orm/2.5/class-Doctrine.ORM.Cache.DefaultCacheFactory.html/">See API Doc</a>.</p>
+</div>
+<div class="section" id="region-lifetime">
+<h3>33.4.3. Region Lifetime<a class="headerlink" href="#region-lifetime" title="Permalink to this headline">¶</a></h3>
+<p>To specify a default lifetime for all regions or specify a different lifetime for a specific region.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="cm">/* @var $config \Doctrine\ORM\Configuration */</span>
+<span class="cm">/* @var $cacheConfig \Doctrine\ORM\Cache\CacheConfiguration */</span>
+<span class="nv">$cacheConfig</span>  <span class="o">=</span>  <span class="nv">$config</span><span class="o">-&gt;</span><span class="na">getSecondLevelCacheConfiguration</span><span class="p">();</span>
+<span class="nv">$regionConfig</span> <span class="o">=</span>  <span class="nv">$cacheConfig</span><span class="o">-&gt;</span><span class="na">getRegionsConfiguration</span><span class="p">();</span>
+
+<span class="c1">// Cache Region lifetime</span>
+<span class="nv">$regionConfig</span><span class="o">-&gt;</span><span class="na">setLifetime</span><span class="p">(</span><span class="s1">&#39;my_entity_region&#39;</span><span class="p">,</span> <span class="mi">3600</span><span class="p">);</span>   <span class="c1">// Time to live for a specific region; In seconds</span>
+<span class="nv">$regionConfig</span><span class="o">-&gt;</span><span class="na">setDefaultLifetime</span><span class="p">(</span><span class="mi">7200</span><span class="p">);</span>                <span class="c1">// Default time to live; In seconds</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cache-log">
+<h3>33.4.4. Cache Log<a class="headerlink" href="#cache-log" title="Permalink to this headline">¶</a></h3>
+<p>By providing a cache logger you should be able to get information about all cache operations such as hits, misses and puts.</p>
+<p><code class="docutils literal"><span class="pre">\Doctrine\ORM\Cache\Logging\StatisticsCacheLogger</span></code> is a built-in implementation that provides basic statistics.</p>
+<blockquote>
+<div><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="cm">/* @var $config \Doctrine\ORM\Configuration */</span>
+<span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Doctrine\ORM\Cache\Logging\StatisticsCacheLogger</span><span class="p">();</span>
+
+<span class="c1">// Cache logger</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">setSecondLevelCacheEnabled</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">getSecondLevelCacheConfiguration</span><span class="p">()</span>
+    <span class="o">-&gt;</span><span class="na">setCacheLogger</span><span class="p">(</span><span class="nv">$logger</span><span class="p">);</span>
+
+
+<span class="c1">// Collect cache statistics</span>
+
+<span class="c1">// Get the number of entries successfully retrieved from a specific region.</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">getRegionHitCount</span><span class="p">(</span><span class="s1">&#39;my_entity_region&#39;</span><span class="p">);</span>
+
+<span class="c1">// Get the number of cached entries *not* found in a specific region.</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">getRegionMissCount</span><span class="p">(</span><span class="s1">&#39;my_entity_region&#39;</span><span class="p">);</span>
+
+<span class="c1">// Get the number of cacheable entries put in cache.</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">getRegionPutCount</span><span class="p">(</span><span class="s1">&#39;my_entity_region&#39;</span><span class="p">);</span>
+
+<span class="c1">// Get the total number of put in all regions.</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">getPutCount</span><span class="p">();</span>
+
+<span class="c1">// Get the total number of entries successfully retrieved from all regions.</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">getHitCount</span><span class="p">();</span>
+
+<span class="c1">// Get the total number of cached entries *not* found in all regions.</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">getMissCount</span><span class="p">();</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>If you want to get more information you should implement <code class="docutils literal"><span class="pre">\Doctrine\ORM\Cache\Logging\CacheLogger</span></code>.
+and collect all information you want.</p>
+<p><a class="reference external" href="http://www.doctrine-project.org/api/orm/2.5/class-Doctrine.ORM.Cache.CacheLogger.html/">See API Doc</a>.</p>
+</div>
+</div>
+<div class="section" id="entity-cache-definition">
+<h2>33.5. Entity cache definition<a class="headerlink" href="#entity-cache-definition" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Entity cache configuration allows you to define the caching strategy and region for an entity.<ul>
+<li><code class="docutils literal"><span class="pre">usage</span></code> Specifies the caching strategy: <code class="docutils literal"><span class="pre">READ_ONLY</span></code>, <code class="docutils literal"><span class="pre">NONSTRICT_READ_WRITE</span></code>, <code class="docutils literal"><span class="pre">READ_WRITE</span></code>. see <a class="reference internal" href="#reference-second-level-cache-mode"><span class="std std-ref">Caching mode</span></a></li>
+<li><code class="docutils literal"><span class="pre">region</span></code> Optional value that specifies the name of the second level cache region.</li>
+</ul>
+</li>
+</ul>
+<div class="configuration-block">
+<ul class="simple">
+<li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="sd">/**</span>
+<span class="sd"> * @Entity</span>
+<span class="sd"> * @Cache(usage=&quot;READ_ONLY&quot;, region=&quot;my_entity_region&quot;)</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Country</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Id</span>
+<span class="sd">     * @GeneratedValue</span>
+<span class="sd">     * @Column(type=&quot;integer&quot;)</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @Column(unique=true)</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$name</span><span class="p">;</span>
+
+    <span class="c1">// other properties and methods</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><em>XML</em><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/orm/doctrine-mapping&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;entity</span> <span class="na">name=</span><span class="s">&quot;Country&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;cache</span> <span class="na">usage=</span><span class="s">&quot;READ_ONLY&quot;</span> <span class="na">region=</span><span class="s">&quot;my_entity_region&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;id</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="na">type=</span><span class="s">&quot;integer&quot;</span> <span class="na">column=</span><span class="s">&quot;id&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;generator</span> <span class="na">strategy=</span><span class="s">&quot;IDENTITY&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/id&gt;</span>
+    <span class="nt">&lt;field</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span> <span class="na">column=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/entity&gt;</span>
+<span class="nt">&lt;/doctrine-mapping&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><em>YAML</em><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">Country</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">entity</span>
+  <span class="l l-Scalar l-Scalar-Plain">cache</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">usage</span> <span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">READ_ONLY</span>
+    <span class="l l-Scalar l-Scalar-Plain">region</span> <span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">my_entity_region</span>
+  <span class="l l-Scalar l-Scalar-Plain">id</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">id</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">integer</span>
+      <span class="l l-Scalar l-Scalar-Plain">id</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+      <span class="l l-Scalar l-Scalar-Plain">generator</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">strategy</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">IDENTITY</span>
+  <span class="l l-Scalar l-Scalar-Plain">fields</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="association-cache-definition">
+<h2>33.6. Association cache definition<a class="headerlink" href="#association-cache-definition" title="Permalink to this headline">¶</a></h2>
+<p>The most common use case is to cache entities. But we can also cache relationships.
+It caches the primary keys of association and cache each element will be cached into its region.</p>
+<div class="configuration-block">
+<ul class="simple">
+<li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="sd">/**</span>
+<span class="sd"> * @Entity</span>
+<span class="sd"> * @Cache(&quot;NONSTRICT_READ_WRITE&quot;)</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">State</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Id</span>
+<span class="sd">     * @GeneratedValue</span>
+<span class="sd">     * @Column(type=&quot;integer&quot;)</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$id</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @Column(unique=true)</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$name</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @Cache(&quot;NONSTRICT_READ_WRITE&quot;)</span>
+<span class="sd">     * @ManyToOne(targetEntity=&quot;Country&quot;)</span>
+<span class="sd">     * @JoinColumn(name=&quot;country_id&quot;, referencedColumnName=&quot;id&quot;)</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$country</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @Cache(&quot;NONSTRICT_READ_WRITE&quot;)</span>
+<span class="sd">     * @OneToMany(targetEntity=&quot;City&quot;, mappedBy=&quot;state&quot;)</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$cities</span><span class="p">;</span>
+
+    <span class="c1">// other properties and methods</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+<li><em>XML</em><div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;doctrine-mapping</span> <span class="na">xmlns=</span><span class="s">&quot;http://doctrine-project.org/schemas/orm/doctrine-mapping&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;entity</span> <span class="na">name=</span><span class="s">&quot;State&quot;</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;cache</span> <span class="na">usage=</span><span class="s">&quot;NONSTRICT_READ_WRITE&quot;</span> <span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;id</span> <span class="na">name=</span><span class="s">&quot;id&quot;</span> <span class="na">type=</span><span class="s">&quot;integer&quot;</span> <span class="na">column=</span><span class="s">&quot;id&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;generator</span> <span class="na">strategy=</span><span class="s">&quot;IDENTITY&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/id&gt;</span>
+
+    <span class="nt">&lt;field</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">type=</span><span class="s">&quot;string&quot;</span> <span class="na">column=</span><span class="s">&quot;name&quot;</span><span class="nt">/&gt;</span>
+
+    <span class="nt">&lt;many-to-one</span> <span class="na">field=</span><span class="s">&quot;country&quot;</span> <span class="na">target-entity=</span><span class="s">&quot;Country&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;cache</span> <span class="na">usage=</span><span class="s">&quot;NONSTRICT_READ_WRITE&quot;</span> <span class="nt">/&gt;</span>
+
+      <span class="nt">&lt;join-columns&gt;</span>
+        <span class="nt">&lt;join-column</span> <span class="na">name=</span><span class="s">&quot;country_id&quot;</span> <span class="na">referenced-column-name=</span><span class="s">&quot;id&quot;</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;/join-columns&gt;</span>
+    <span class="nt">&lt;/many-to-one&gt;</span>
+
+    <span class="nt">&lt;one-to-many</span> <span class="na">field=</span><span class="s">&quot;cities&quot;</span> <span class="na">target-entity=</span><span class="s">&quot;City&quot;</span> <span class="na">mapped-by=</span><span class="s">&quot;state&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;cache</span> <span class="na">usage=</span><span class="s">&quot;NONSTRICT_READ_WRITE&quot;</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/one-to-many&gt;</span>
+  <span class="nt">&lt;/entity&gt;</span>
+<span class="nt">&lt;/doctrine-mapping&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><em>YAML</em><div class="highlight-yaml"><div class="highlight"><pre><span></span><span class="l l-Scalar l-Scalar-Plain">State</span><span class="p p-Indicator">:</span>
+  <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">entity</span>
+  <span class="l l-Scalar l-Scalar-Plain">cache</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">usage</span> <span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">NONSTRICT_READ_WRITE</span>
+  <span class="l l-Scalar l-Scalar-Plain">id</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">id</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">integer</span>
+      <span class="l l-Scalar l-Scalar-Plain">id</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+      <span class="l l-Scalar l-Scalar-Plain">generator</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">strategy</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">IDENTITY</span>
+  <span class="l l-Scalar l-Scalar-Plain">fields</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">name</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">type</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+
+  <span class="l l-Scalar l-Scalar-Plain">manyToOne</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">state</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">targetEntity</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">Country</span>
+      <span class="l l-Scalar l-Scalar-Plain">joinColumns</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">country_id</span><span class="p p-Indicator">:</span>
+          <span class="l l-Scalar l-Scalar-Plain">referencedColumnName</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
+      <span class="l l-Scalar l-Scalar-Plain">cache</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">usage</span> <span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">NONSTRICT_READ_WRITE</span>
+
+  <span class="l l-Scalar l-Scalar-Plain">oneToMany</span><span class="p p-Indicator">:</span>
+    <span class="l l-Scalar l-Scalar-Plain">cities</span><span class="p p-Indicator">:</span>
+      <span class="l l-Scalar l-Scalar-Plain">targetEntity:City</span>
+      <span class="l l-Scalar l-Scalar-Plain">mappedBy</span><span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">state</span>
+      <span class="l l-Scalar l-Scalar-Plain">cache</span><span class="p p-Indicator">:</span>
+        <span class="l l-Scalar l-Scalar-Plain">usage</span> <span class="p p-Indicator">:</span> <span class="l l-Scalar l-Scalar-Plain">NONSTRICT_READ_WRITE</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<p>&gt; Note: for this to work, the target entity must also be marked as cacheable.</p>
+<div class="section" id="cache-usage">
+<h3>33.6.1. Cache usage<a class="headerlink" href="#cache-usage" title="Permalink to this headline">¶</a></h3>
+<p>Basic entity cache</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="k">new</span> <span class="nx">Country</span><span class="p">(</span><span class="nv">$name</span><span class="p">));</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>                         <span class="c1">// Hit database to insert the row and put into cache</span>
+
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">clear</span><span class="p">();</span>                         <span class="c1">// Clear entity manager</span>
+
+<span class="nv">$country1</span>  <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// Retrieve item from cache</span>
+
+<span class="nv">$country</span><span class="o">-&gt;</span><span class="na">setName</span><span class="p">(</span><span class="s2">&quot;New Name&quot;</span><span class="p">);</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="nv">$country</span><span class="p">);</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>                         <span class="c1">// Hit database to update the row and update cache</span>
+
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">clear</span><span class="p">();</span>                         <span class="c1">// Clear entity manager</span>
+
+<span class="nv">$country2</span>  <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;Country&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span> <span class="c1">// Retrieve item from cache</span>
+                                      <span class="c1">// Notice that $country1 and $country2 are not the same instance.</span>
+</pre></div>
+</div>
+<p>Association cache</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="c1">// Hit database to insert the row and put into cache</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="k">new</span> <span class="nx">State</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$country</span><span class="p">));</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
+
+<span class="c1">// Clear entity manager</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">clear</span><span class="p">();</span>
+
+<span class="c1">// Retrieve item from cache</span>
+<span class="nv">$state</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;State&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">// Hit database to update the row and update cache entry</span>
+<span class="nv">$state</span><span class="o">-&gt;</span><span class="na">setName</span><span class="p">(</span><span class="s2">&quot;New Name&quot;</span><span class="p">);</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="nv">$state</span><span class="p">);</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
+
+<span class="c1">// Create a new collection item</span>
+<span class="nv">$city</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">City</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$state</span><span class="p">);</span>
+<span class="nv">$state</span><span class="o">-&gt;</span><span class="na">addCity</span><span class="p">(</span><span class="nv">$city</span><span class="p">);</span>
+
+<span class="c1">// Hit database to insert new collection item,</span>
+<span class="c1">// put entity and collection cache into cache.</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="nv">$city</span><span class="p">);</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="nv">$state</span><span class="p">);</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
+
+<span class="c1">// Clear entity manager</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">clear</span><span class="p">();</span>
+
+<span class="c1">// Retrieve item from cache</span>
+<span class="nv">$state</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;State&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">// Retrieve association from cache</span>
+<span class="nv">$country</span> <span class="o">=</span> <span class="nv">$state</span><span class="o">-&gt;</span><span class="na">getCountry</span><span class="p">();</span>
+
+<span class="c1">// Retrieve collection from cache</span>
+<span class="nv">$cities</span> <span class="o">=</span> <span class="nv">$state</span><span class="o">-&gt;</span><span class="na">getCities</span><span class="p">();</span>
+
+<span class="k">echo</span> <span class="nv">$country</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$state</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+
+<span class="c1">// Retrieve each collection item from cache</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$cities</span> <span class="k">as</span> <span class="nv">$city</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$city</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Notice that all entities should be marked as cacheable.</p>
+</div>
+</div>
+</div>
+<div class="section" id="using-the-query-cache">
+<h2>33.7. Using the query cache<a class="headerlink" href="#using-the-query-cache" title="Permalink to this headline">¶</a></h2>
+<p>The second level cache stores the entities, associations and collections.
+The query cache stores the results of the query but as identifiers, entity values are actually stored in the 2nd level cache.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Query cache should always be used in conjunction with the second-level-cache for those entities which should be cached.</p>
+</div>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="cm">/* @var $em \Doctrine\ORM\EntityManager */</span>
+
+<span class="c1">// Execute database query, store query cache and entity cache</span>
+<span class="nv">$result1</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="s1">&#39;SELECT c FROM Country c ORDER BY c.name&#39;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">setCacheable</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">getResult</span><span class="p">();</span>
+
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">clear</span><span class="p">()</span>
+
+<span class="c1">// Check if query result is valid and load entities from cache</span>
+<span class="nv">$result2</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="s1">&#39;SELECT c FROM Country c ORDER BY c.name&#39;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">setCacheable</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">getResult</span><span class="p">();</span>
+</pre></div>
+</div>
+<div class="section" id="cache-mode">
+<h3>33.7.1. Cache mode<a class="headerlink" href="#cache-mode" title="Permalink to this headline">¶</a></h3>
+<p>The Cache Mode controls how a particular query interacts with the second-level cache:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">Cache::MODE_GET</span></code> - May read items from the cache, but will not add items.</li>
+<li><code class="docutils literal"><span class="pre">Cache::MODE_PUT</span></code> - Will never read items from the cache, but will add items to the cache as it reads them from the database.</li>
+<li><code class="docutils literal"><span class="pre">Cache::MODE_NORMAL</span></code> - May read items from the cache, and add items to the cache.</li>
+<li><code class="docutils literal"><span class="pre">Cache::MODE_REFRESH</span></code> - The query will never read items from the cache, but will refresh items to the cache as it reads them from the database.</li>
+</ul>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="cm">/* @var $em \Doctrine\ORM\EntityManager */</span>
+<span class="c1">// Will refresh the query cache and all entities the cache as it reads from the database.</span>
+<span class="nv">$result1</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="s1">&#39;SELECT c FROM Country c ORDER BY c.name&#39;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">setCacheMode</span><span class="p">(</span><span class="nx">Cache</span><span class="o">::</span><span class="na">MODE_GET</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">setCacheable</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">getResult</span><span class="p">();</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The the default query cache mode is <code class="docutils literal"><span class="pre">`Cache::MODE_NORMAL`</span></code></p>
+</div>
+</div>
+<div class="section" id="delete-update-queries">
+<h3>33.7.2. DELETE / UPDATE queries<a class="headerlink" href="#delete-update-queries" title="Permalink to this headline">¶</a></h3>
+<p>DQL UPDATE / DELETE statements are ported directly into a database and bypass the second-level cache,
+Entities that are already cached will NOT be invalidated.
+However the cached data could be evicted using the cache API or an special query hint.</p>
+<p>Execute the <code class="docutils literal"><span class="pre">UPDATE</span></code> and invalidate <code class="docutils literal"><span class="pre">all</span> <span class="pre">cache</span> <span class="pre">entries</span></code> using <code class="docutils literal"><span class="pre">Query::HINT_CACHE_EVICT</span></code></p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="c1">// Execute and invalidate</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_em</span><span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="s2">&quot;UPDATE Entity\Country u SET u.name = &#39;unknown&#39; WHERE u.id = 1&quot;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">setHint</span><span class="p">(</span><span class="nx">Query</span><span class="o">::</span><span class="na">HINT_CACHE_EVICT</span><span class="p">,</span> <span class="k">true</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Execute the <code class="docutils literal"><span class="pre">UPDATE</span></code> and invalidate <code class="docutils literal"><span class="pre">all</span> <span class="pre">cache</span> <span class="pre">entries</span></code> using the cache API</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="c1">// Execute</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_em</span><span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="s2">&quot;UPDATE Entity\Country u SET u.name = &#39;unknown&#39; WHERE u.id = 1&quot;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+<span class="c1">// Invoke Cache API</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">getCache</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">evictEntityRegion</span><span class="p">(</span><span class="s1">&#39;Entity\Country&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Execute the <code class="docutils literal"><span class="pre">UPDATE</span></code> and invalidate <code class="docutils literal"><span class="pre">a</span> <span class="pre">specific</span> <span class="pre">cache</span> <span class="pre">entry</span></code> using the cache API</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="c1">// Execute</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_em</span><span class="o">-&gt;</span><span class="na">createQuery</span><span class="p">(</span><span class="s2">&quot;UPDATE Entity\Country u SET u.name = &#39;unknown&#39; WHERE u.id = 1&quot;</span><span class="p">)</span>
+    <span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+<span class="c1">// Invoke Cache API</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">getCache</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">evictEntity</span><span class="p">(</span><span class="s1">&#39;Entity\Country&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="using-the-repository-query-cache">
+<h2>33.8. Using the repository query cache<a class="headerlink" href="#using-the-repository-query-cache" title="Permalink to this headline">¶</a></h2>
+<p>As well as <code class="docutils literal"><span class="pre">Query</span> <span class="pre">Cache</span></code> all persister queries store only identifier values for an individual query.
+All persister use a single timestamps cache region keeps track of the last update for each persister,
+When a query is loaded from cache, the timestamp region is checked for the last update for that persister.
+Using the last update timestamps as part of the query key invalidate the cache key when an update occurs.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="c1">// load from database and store cache query key hashing the query + parameters + last timestamp cache region..</span>
+<span class="nv">$entities</span>   <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">getRepository</span><span class="p">(</span><span class="s1">&#39;Entity\Country&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">findAll</span><span class="p">();</span>
+
+<span class="c1">// load from query and entities from cache..</span>
+<span class="nv">$entities</span>   <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">getRepository</span><span class="p">(</span><span class="s1">&#39;Entity\Country&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">findAll</span><span class="p">();</span>
+
+<span class="c1">// update the timestamp cache region for Country</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">persist</span><span class="p">(</span><span class="k">new</span> <span class="nx">Country</span><span class="p">(</span><span class="s1">&#39;zombieland&#39;</span><span class="p">));</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
+<span class="nv">$em</span><span class="o">-&gt;</span><span class="na">clear</span><span class="p">();</span>
+
+<span class="c1">// Reload from database.</span>
+<span class="c1">// At this point the query cache key if not logger valid, the select goes straight</span>
+<span class="nv">$entities</span>   <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">getRepository</span><span class="p">(</span><span class="s1">&#39;Entity\Country&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">findAll</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="cache-api">
+<h2>33.9. Cache API<a class="headerlink" href="#cache-api" title="Permalink to this headline">¶</a></h2>
+<p>Caches are not aware of changes made by another application.
+However, you can use the cache API to check / invalidate cache entries.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="cm">/* @var $cache \Doctrine\ORM\Cache */</span>
+<span class="nv">$cache</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">getCache</span><span class="p">();</span>
+
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">containsEntity</span><span class="p">(</span><span class="s1">&#39;Entity\State&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>      <span class="c1">// Check if the cache exists</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">evictEntity</span><span class="p">(</span><span class="s1">&#39;Entity\State&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>        <span class="c1">// Remove an entity from cache</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">evictEntityRegion</span><span class="p">(</span><span class="s1">&#39;Entity\State&#39;</span><span class="p">);</span>     <span class="c1">// Remove all entities from cache</span>
+
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">containsCollection</span><span class="p">(</span><span class="s1">&#39;Entity\State&#39;</span><span class="p">,</span> <span class="s1">&#39;cities&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>   <span class="c1">// Check if the cache exists</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">evictCollection</span><span class="p">(</span><span class="s1">&#39;Entity\State&#39;</span><span class="p">,</span> <span class="s1">&#39;cities&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>      <span class="c1">// Remove an entity collection from cache</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">evictCollectionRegion</span><span class="p">(</span><span class="s1">&#39;Entity\State&#39;</span><span class="p">,</span> <span class="s1">&#39;cities&#39;</span><span class="p">);</span>   <span class="c1">// Remove all collections from cache</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="limitations">
+<h2>33.10. Limitations<a class="headerlink" href="#limitations" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="composite-primary-key">
+<h3>33.10.1. Composite primary key<a class="headerlink" href="#composite-primary-key" title="Permalink to this headline">¶</a></h3>
+<p>Composite primary key are supported by second level cache,
+however when one of the keys is an association the cached entity should always be retrieved using the association identifier.
+For performance reasons the cache API does not extract from composite primary key.</p>
+<div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
+<span class="sd">/**</span>
+<span class="sd"> * @Entity</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Reference</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Id</span>
+<span class="sd">     * @ManyToOne(targetEntity=&quot;Article&quot;, inversedBy=&quot;references&quot;)</span>
+<span class="sd">     * @JoinColumn(name=&quot;source_id&quot;, referencedColumnName=&quot;article_id&quot;)</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$source</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @Id</span>
+<span class="sd">     * @ManyToOne(targetEntity=&quot;Article&quot;)</span>
+<span class="sd">     * @JoinColumn(name=&quot;target_id&quot;, referencedColumnName=&quot;article_id&quot;)</span>
+<span class="sd">     */</span>
+    <span class="k">private</span> <span class="nv">$target</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Supported</span>
+<span class="cm">/* @var $article Article */</span>
+<span class="nv">$article</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;Article&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">// Supported</span>
+<span class="cm">/* @var $article Article */</span>
+<span class="nv">$article</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;Article&#39;</span><span class="p">,</span> <span class="nv">$article</span><span class="p">);</span>
+
+<span class="c1">// Supported</span>
+<span class="nv">$id</span>        <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;source&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">);</span>
+<span class="nv">$reference</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">,</span> <span class="nv">$id</span><span class="p">);</span>
+
+<span class="c1">// NOT Supported</span>
+<span class="nv">$id</span>        <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;source&#39;</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nx">Article</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;target&#39;</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nx">Article</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+<span class="nv">$reference</span> <span class="o">=</span> <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="s1">&#39;Reference&#39;</span><span class="p">,</span> <span class="nv">$id</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="distributed-environments">
+<h3>33.10.2. Distributed environments<a class="headerlink" href="#distributed-environments" title="Permalink to this headline">¶</a></h3>
+<p>Some cache driver are not meant to be used in a distributed environment.
+Load-balancer for distributing workloads across multiple computing resources
+should be used in conjunction with distributed caching system such as memcached, redis, riak ...</p>
+<p>Caches should be used with care when using a load-balancer if you don&#8217;t share the cache.
+While using APC or any file based cache update occurred in a specific machine would not reflect to the cache in other machines.</p>
+</div>
+<div class="section" id="paginator">
+<h3>33.10.3. Paginator<a class="headerlink" href="#paginator" title="Permalink to this headline">¶</a></h3>
+<p>Count queries generated by <code class="docutils literal"><span class="pre">Doctrine\ORM\Tools\Pagination\Paginator</span></code> are not cached by second-level cache.
+Although entities and query result are cached count queries will hit the database every time.</p>
+</div>
+</div>
+</div>
+
+
+              </div>
+                </div>
+
+            </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+             
+                <h3>Project Versions</h3>
+
+                <select name="versions" id="versions">
+            
+            <option value="http://readthedocs.org/en/latest/">latest</option>
+            
+            <option value="http://readthedocs.org/en/stable/">stable</option>
+            
+                </select>
+            
+            <div id="searchbox" style="">
+              <h3>Search</h3>
+                <form class="search" action="http://readthedocs.org/search/project/" method="get">
+                  <input type="text" name="q" size="18">
+                  <input type="submit" value="Go">
+                  <input type="hidden" name="selected_facets" value="project:Doctrine ORM">
+                </form>
+            </div>
+            <h3><a href="../index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">33. The Second Level Cache</a><ul>
+<li><a class="reference internal" href="#caching-regions">33.1. Caching Regions</a></li>
+<li><a class="reference internal" href="#cache-regions">33.2. Cache Regions</a><ul>
+<li><a class="reference internal" href="#cache-region">33.2.1. Cache region</a></li>
+<li><a class="reference internal" href="#concurrent-cache-region">33.2.2. Concurrent cache region</a></li>
+<li><a class="reference internal" href="#timestamp-region">33.2.3. Timestamp region</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caching-mode">33.3. Caching mode</a><ul>
+<li><a class="reference internal" href="#built-in-cached-persisters">33.3.1. Built-in cached persisters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration">33.4. Configuration</a><ul>
+<li><a class="reference internal" href="#enable-second-level-cache">33.4.1. Enable Second Level Cache</a></li>
+<li><a class="reference internal" href="#cache-factory">33.4.2. Cache Factory</a></li>
+<li><a class="reference internal" href="#region-lifetime">33.4.3. Region Lifetime</a></li>
+<li><a class="reference internal" href="#cache-log">33.4.4. Cache Log</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#entity-cache-definition">33.5. Entity cache definition</a></li>
+<li><a class="reference internal" href="#association-cache-definition">33.6. Association cache definition</a><ul>
+<li><a class="reference internal" href="#cache-usage">33.6.1. Cache usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-query-cache">33.7. Using the query cache</a><ul>
+<li><a class="reference internal" href="#cache-mode">33.7.1. Cache mode</a></li>
+<li><a class="reference internal" href="#delete-update-queries">33.7.2. DELETE / UPDATE queries</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-repository-query-cache">33.8. Using the repository query cache</a></li>
+<li><a class="reference internal" href="#cache-api">33.9. Cache API</a></li>
+<li><a class="reference internal" href="#limitations">33.10. Limitations</a><ul>
+<li><a class="reference internal" href="#composite-primary-key">33.10.1. Composite primary key</a></li>
+<li><a class="reference internal" href="#distributed-environments">33.10.2. Distributed environments</a></li>
+<li><a class="reference internal" href="#paginator">33.10.3. Paginator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="advanced-configuration.html"
+                                  title="previous chapter">32. Advanced Configuration</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="security.html"
+                                  title="next chapter">34. Security</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="../_sources/reference/second-level-cache.rst.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+        </div>
+      </div>
+          <div class="clearer"></div>
+        </div>
+          <div class="footer">
+              &copy; Copyright 2010-%y, Doctrine Project Team.
+              Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.5.3.
+            <br/>
+            <a target="_BLANK" href="http://www.servergrove.com"><img src="http://www.doctrine-project.org/images/servergrove.jpg" /></a>      <br/><br/>
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+              <input type="hidden" name="cmd" value="_s-xclick" />
+              <input type="hidden" name="hosted_button_id" value="BAE2E3XANQ77Y" />
+              <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" />
+              <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+            </form>
+          </div>
+      </div>
+
+      <div id="bot-rcnr">
+        <div class="tl"><!-- corner --></div>
+      </div>
+    </div>
+
+  <script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+  _uacct = "UA-288343-7";
+  urchinTracker();
+  </script>
+  <a class="githublink" href="http://github.com/doctrine"><img src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+  </body>
+</html>
