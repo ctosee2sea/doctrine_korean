@@ -114,80 +114,64 @@ READTHEDOCS_DATA['source_suffix'] = '.rst'
               <div class="body" >
                 
   <div class="section" id="getting-started-with-doctrine">
-<h1>Getting Started with Doctrine<a class="headerlink" href="#getting-started-with-doctrine" title="Permalink to this headline">¶</a></h1>
-<p>This guide covers getting started with the Doctrine ORM. After working
-through the guide you should know:</p>
+<h1>독트린 시작하기<a class="headerlink" href="#getting-started-with-doctrine" title="Permalink to this headline">¶</a></h1>
+<p>이 안내서는 독트린 ORM을 시작하는 방법을 다룹니다. 학습 목표는 아래와 같습니다.</p>
 <ul class="simple">
-<li>How to install and configure Doctrine by connecting it to a database</li>
-<li>Mapping PHP objects to database tables</li>
-<li>Generating a database schema from PHP objects</li>
-<li>Using the <code class="docutils literal"><span class="pre">EntityManager</span></code> to insert, update, delete and find
-objects in the database.</li>
+<li>독트린을 데이터베이스에 연결하여 설치하고 구성할 줄 안다.</li>
+<li>PHP 객체를 데이터베이스 테이블에 매핑 시킨다.</li>
+<li>PHP 객체에서 데이터베이스 스키마를 생성한다.</li>
+<li><code class="docutils literal"><span class="pre">EntityManager</span></code>를 사용하여 데이터베이스에서 객체를 삽입, 수정, 삭제 및 찾기를 할 수 있다.</li>
 </ul>
 <div class="section" id="guide-assumptions">
-<h2>Guide Assumptions<a class="headerlink" href="#guide-assumptions" title="Permalink to this headline">¶</a></h2>
-<p>This guide is designed for beginners that haven&#8217;t worked with Doctrine ORM
-before. There are some prerequesites for the tutorial that have to be
-installed:</p>
+<h2>안내서의 요구 사항<a class="headerlink" href="#guide-assumptions" title="Permalink to this headline">¶</a></h2>
+<p>이 안내서는 이전에 독트린 ORM을 사용해보지 않은 초보자를 대상으로 합니다. <br />
+이 튜토리얼을 위해 설치해야 할 것들이 몇 가지 있습니다.</p>
 <ul class="simple">
-<li>PHP (latest stable version)</li>
-<li>Composer Package Manager (<a class="reference external" href="http://getcomposer.org/doc/00-intro.md">Install Composer</a>)</li>
+<li>PHP (안정적인 최신 버젼)</li>
+<li>컴포져 패키지 매니져 (<a class="reference external" href="http://getcomposer.org/doc/00-intro.md">컴포져 설치</a>)</li>
 </ul>
-<p>The code of this tutorial is <a class="reference external" href="https://github.com/doctrine/doctrine2-orm-tutorial">available on Github</a>.</p>
+<p>이 튜토리얼의 코드는 <a class="reference external" href="https://github.com/doctrine/doctrine2-orm-tutorial">깃허브에 있습니다.</a>.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This tutorial assumes you work with <strong>Doctrine 2.4</strong> and above.
-Some of the code will not work with lower versions.</p>
+<p class="first admonition-title">노트</p>
+<p class="last">이 튜토리얼은 <strong>독트린 2.4</strong> 이상에서 작업해야 합니다. <br />
+일부 코드는 하위버젼에서 작동하지 않을 수 있습니다.</p>
 </div>
 </div>
 <div class="section" id="what-is-doctrine">
-<h2>What is Doctrine?<a class="headerlink" href="#what-is-doctrine" title="Permalink to this headline">¶</a></h2>
-<p>Doctrine 2 is an <a class="reference external" href="http://en.wikipedia.org/wiki/Object-relational_mapping">object-relational mapper (ORM)</a> for PHP 5.4+ that
-provides transparent persistence for PHP objects. It uses the Data Mapper
-pattern at the heart, aiming for a complete separation of your domain/business
-logic from the persistence in a relational database management system.</p>
-<p>The benefit of Doctrine for the programmer is the ability to focus
-on the object-oriented business logic and worry about persistence only
-as a secondary problem. This doesn&#8217;t mean persistence is downplayed by Doctrine
-2, however it is our belief that there are considerable benefits for
-object-oriented programming if persistence and entities are kept
-separated.</p>
+<h2>독트린은 무엇인가?<a class="headerlink" href="#what-is-doctrine" title="Permalink to this headline">¶</a></h2>
+<p>독트린 2는 PHP 객체에 투명한 영속성을 부여하는 PHP 5.4+ 용 <a class="reference external" href="http://en.wikipedia.org/wiki/Object-relational_mapping">객체 관계형 매퍼 (ORM)</a>입니다. <br />
+관계형 데이터베이스 시스템 안에서 도메인/비즈니스 로직과 영속성을 완전히 분리시키기 위해 데이터 매퍼 패턴을 중점적으로 사용합니다.</p>
+<p>프로그래머가 객체 지향 비즈니스 로직에 집중하고, 영속성은 부차적인 문제로 만드는 것이 독트린의 장점입니다. <br />
+독트린 내에서 영속성이 중요하지 않다는 의미가 아니라, 영속성과 엔티티가 분리되어 있을 때 OOP의 이점을 살릴 수 있다는 믿음입니다.</p>
 <div class="section" id="what-are-entities">
-<h3>What are Entities?<a class="headerlink" href="#what-are-entities" title="Permalink to this headline">¶</a></h3>
-<p>Entities are PHP Objects that can be identified over many requests
-by a unique identifier or primary key. These classes don&#8217;t need to extend any
-abstract base class or interface. An entity class must not be final
-or contain final methods. Additionally it must not implement
-<strong>clone</strong> nor <strong>wakeup</strong>, unless it <a class="reference internal" href="../cookbook/implementing-wakeup-or-clone.html"><span class="doc">does so safely</span></a>.</p>
-<p>An entity contains persistable properties. A persistable property
-is an instance variable of the entity that is saved into and retrieved from the database
-by Doctrine&#8217;s data mapping capabilities.</p>
+<h3>엔티티는 무엇인가?<a class="headerlink" href="#what-are-entities" title="Permalink to this headline">¶</a></h3>
+<p>엔티티는 고유 Id나 기본키로 요청하여 식별할 수 있는 PHP 객체 입니다. <br />
+이 클래스는 추상 기본 클래스나 인터페이스로 확장할 필요가 없습니다. <br />
+엔티티 클래스는 최종 클래스이거나 최종 메소드를 포함할 수 없습니다. <br />
+게다가 엔티티는 <a class="reference internal" href="../cookbook/implementing-wakeup-or-clone.html"><span class="doc">아주 안전하게</span></a> 하지 않는 한 <strong>복제</strong>나 <strong>깨우기</strong>를 구현할 수 없습니다. <br />
+</p>
+<p>엔티티는 영속적인 속성을 포함합니다. <br />
+영속적인 속성은 독트린의 데이터 매핑 기능을 통해 데이터베이스에 저장되고, 데이터베이스에서 검색할 수 있는 엔티티의 인스턴스 변수입니다.</p>
 </div>
 </div>
 <div class="section" id="an-example-model-bug-tracker">
-<h2>An Example Model: Bug Tracker<a class="headerlink" href="#an-example-model-bug-tracker" title="Permalink to this headline">¶</a></h2>
-<p>For this Getting Started Guide for Doctrine we will implement the
-Bug Tracker domain model from the
-<a class="reference external" href="http://framework.zend.com/manual/1.12/en/zend.db.adapter.html">Zend_Db_Table</a>
-documentation. Reading their documentation we can extract the
-requirements:</p>
+<h2>예제 모델 : 버그 추적기<a class="headerlink" href="#an-example-model-bug-tracker" title="Permalink to this headline">¶</a></h2>
+<p>독트린 시작하기 가이드를 통해 우리는 <a class="reference external" href="http://framework.zend.com/manual/1.12/en/zend.db.adapter.html">Zend_Db_Table</a> 문서에서 버그 추적기 도메인 모델을 구현할 것입니다. <br />
+이 문서를 읽으면서 우리는 이러한 요구사항을 도출할 수 있습니다.</p>
 <ul class="simple">
-<li>A Bug has a description, creation date, status, reporter and
-engineer</li>
-<li>A Bug can occur on different Products (platforms)</li>
-<li>A Product has a name.</li>
-<li>Bug reporters and engineers are both Users of the system.</li>
-<li>A User can create new Bugs.</li>
-<li>The assigned engineer can close a Bug.</li>
-<li>A User can see all his reported or assigned Bugs.</li>
-<li>Bugs can be paginated through a list-view.</li>
+<li>각 버그는 설명, 생성 날짜, 상태, 보고자, 엔지니어가 있습니다.</li>
+<li>버그는 다른 제품(이나 플랫폼)에서 발생할 수 있습니다.</li>
+<li>각 제품은 이름이 있습니다.</li>
+<li>버그 보고자와 엔지니어는 모두 시스템 유저입니다.</li>
+<li>각 사용자는 새로운 버그를 만들 수 있습니다.</li>
+<li>할당받은 엔지니어가 버그를 종료시킬 수 있습니다.</li>
+<li>각 유저는 자신이 보고하였거나 할당받은 버그를 볼 수 있습니다.</li>
+<li>버그는 list-view를 통해 페이징 할 수 있습니다.</li>
 </ul>
 </div>
 <div class="section" id="project-setup">
-<h2>Project Setup<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
-<p>Create a new empty folder for this tutorial project, for example
-<code class="docutils literal"><span class="pre">doctrine2-tutorial</span></code> and create a new file <code class="docutils literal"><span class="pre">composer.json</span></code> with
-the following contents:</p>
+<h2>프로젝트 설정<a class="headerlink" href="#project-setup" title="Permalink to this headline">¶</a></h2>
+<p>이 튜토리얼 프로젝트를 위해 <code class="docutils literal"><span class="pre">doctrine2-tutorial</span></code> 같은 이름의 새로운 빈 폴더를 만들고, 아래의 내용을 담은 <code class="docutils literal"><span class="pre">composer.json</span></code> 파일을 생성하세요.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;require&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;doctrine/orm&quot;</span><span class="p">:</span> <span class="s2">&quot;2.4.*&quot;</span><span class="p">,</span>
@@ -199,14 +183,13 @@ the following contents:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Install Doctrine using the Composer Dependency Management tool, by calling:</p>
+<p>컴포저 의존성 관리 도구로 다음을 호출하여 독트린을 설치합니다.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ composer install
 </pre></div>
 </div>
-<p>This will install the packages Doctrine Common, Doctrine DBAL, Doctrine ORM,
-Symfony YAML and Symfony Console into the <cite>vendor</cite> directory. The Symfony
-dependencies are not required by Doctrine but will be used in this tutorial.</p>
-<p>Add the following directories:</p>
+<p>독트린 공통 패키지, DBAL, ORM, 심포니 YAML, 심포니 콘솔이 <cite>vendor</cite> 폴더에 설치될 것입니다. <br />
+심포니 의존성은 필수가 아니지만, 이 튜토리얼에서는 사용합니다.</p>
+<p>다음 폴더들을 추가하십시오.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>doctrine2-tutorial
 |-- config
 |   |-- xml
@@ -216,13 +199,11 @@ dependencies are not required by Doctrine but will be used in this tutorial.</p>
 </div>
 </div>
 <div class="section" id="obtaining-the-entitymanager">
-<h2>Obtaining the EntityManager<a class="headerlink" href="#obtaining-the-entitymanager" title="Permalink to this headline">¶</a></h2>
-<p>Doctrine&#8217;s public interface is the EntityManager, it provides the
-access point to the complete lifecycle management of your entities
-and transforms entities from and back to persistence. You have to
-configure and create it to use your entities with Doctrine 2. I
-will show the configuration steps and then discuss them step by
-step:</p>
+<h2>EntityManager 취득하기<a class="headerlink" href="#obtaining-the-entitymanager" title="Permalink to this headline">¶</a></h2>
+<p>독트린의 공용 인터페이스는 EntityManager 입니다. <br />
+EntityManager는 엔티티와 엔티티 영속성 변경등의 전체 라이프사이클 관리를 위한 액세스 포인트를 제공합니다. <br />
+독트린 2에서 엔티티를 사용하기 위해서는 엔티티를 구성하고 생성해야 합니다. <br />
+이제 구성 단계를 보여주고, 단계별로 살펴 보겠습니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// bootstrap.php</span>
 <span class="k">use</span> <span class="nx">Doctrine\ORM\Tools\Setup</span><span class="p">;</span>
@@ -230,47 +211,41 @@ step:</p>
 
 <span class="k">require_once</span> <span class="s2">&quot;vendor/autoload.php&quot;</span><span class="p">;</span>
 
+<span class="c1">// 주석 달기를 위한 간단한 '기본적인' 독트린 ORM 구성 생성</span>
 <span class="c1">// Create a simple &quot;default&quot; Doctrine ORM configuration for Annotations</span>
 <span class="nv">$isDevMode</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
 <span class="nv">$config</span> <span class="o">=</span> <span class="nx">Setup</span><span class="o">::</span><span class="na">createAnnotationMetadataConfiguration</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="no">__DIR__</span><span class="o">.</span><span class="s2">&quot;/src&quot;</span><span class="p">),</span> <span class="nv">$isDevMode</span><span class="p">);</span>
+<span class="c1">// 아니면 yaml이나 XML을 사용하기 위해 아래의 코드 사용</span>
 <span class="c1">// or if you prefer yaml or XML</span>
 <span class="c1">//$config = Setup::createXMLMetadataConfiguration(array(__DIR__.&quot;/config/xml&quot;), $isDevMode);</span>
 <span class="c1">//$config = Setup::createYAMLMetadataConfiguration(array(__DIR__.&quot;/config/yaml&quot;), $isDevMode);</span>
 
+<span class="c1">// 데이터베이스 구성 매개변수</span>
 <span class="c1">// database configuration parameters</span>
 <span class="nv">$conn</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
     <span class="s1">&#39;driver&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;pdo_sqlite&#39;</span><span class="p">,</span>
     <span class="s1">&#39;path&#39;</span> <span class="o">=&gt;</span> <span class="no">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/db.sqlite&#39;</span><span class="p">,</span>
 <span class="p">);</span>
 
+<span class="c1">// 엔티티 관리자 취득</span>
 <span class="c1">// obtaining the entity manager</span>
 <span class="nv">$entityManager</span> <span class="o">=</span> <span class="nx">EntityManager</span><span class="o">::</span><span class="na">create</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$config</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>The first require statement sets up the autoloading capabilities of Doctrine
-using the Composer autoload.</p>
-<p>The second block consists of the instantiation of the ORM
-<code class="docutils literal"><span class="pre">Configuration</span></code> object using the Setup helper. It assumes a bunch
-of defaults that you don&#8217;t have to bother about for now. You can
-read up on the configuration details in the
-<a class="reference internal" href="../reference/configuration.html"><span class="doc">reference chapter on configuration</span></a>.</p>
-<p>The third block shows the configuration options required to connect
-to a database, in my case a file-based sqlite database. All the
-configuration options for all the shipped drivers are given in the
-<a class="reference external" href="http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/">DBAL Configuration section of the manual</a>.</p>
-<p>The last block shows how the <code class="docutils literal"><span class="pre">EntityManager</span></code> is obtained from a
-factory method.</p>
+<p>첫 번째 require 구분은 컴포저 오토로드를 사용해서 독트린 오토로딩 기능을 설정합니다.</p>
+<p>두 번째 블록은 설치 도우미를 사용한 ORM <code class="docutils literal"><span class="pre">Configuration</span></code> 객체의 예시로 구성되어 있습니다. <br />
+이것은 지금 당장은 신경쓰지 않아도 되는 기본값들을 처리합니다. <br />
+<a class="reference internal" href="../reference/configuration.html"><span class="doc">구성에 대한 레퍼전스 장</span></a>에서 구성 상세를 읽을 수 있습니다.
+</p>
+<p>세 번째 블럭은 데이터베이스 연결을 위한 구성 옵션 요구사항들입니다. 이 경우에는 파일 기반의 sqlite 데이터베이스입니다. <br />
+연결 가능한 다른 드라이버들에 대한 구성 옵션들은 <a class="reference external" href="http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/">DBAL 구성 섹션 메뉴얼</a>에 있습니다. </p>
+<p>마지막 블록은 factory 메소드에서 <code class="docutils literal"><span class="pre">EntityManager</span></code>을 취득하는 법을 보여줍니다.</p>
 </div>
 <div class="section" id="generating-the-database-schema">
-<h2>Generating the Database Schema<a class="headerlink" href="#generating-the-database-schema" title="Permalink to this headline">¶</a></h2>
-<p>Now that we have defined the Metadata mappings and bootstrapped the
-EntityManager we want to generate the relational database schema
-from it. Doctrine has a Command-Line Interface that allows you to
-access the SchemaTool, a component that generates the required
-tables to work with the metadata.</p>
-<p>For the command-line tool to work a cli-config.php file has to be
-present in the project root directory, where you will execute the
-doctrine command. Its a fairly simple file:</p>
+<h2>데이터베이스 스키마 생성<a class="headerlink" href="#generating-the-database-schema" title="Permalink to this headline">¶</a></h2>
+<p>이제 우리는 메타 데이터 매핑을 정의하고, 우리가 생성하기 원하는 관계형 데이터베이스 스키마를 불러올 EntityManager를 로딩(bootstrap)할 것입니다. <br />
+독트린에는 메타데이터 작업에 필요한 테이블을 생성하는 컴포넌트인 SchemaTool에 접근할 수 있는 CLI(Command-Line Interface)가 있습니다.</p>
+<p>CLI가 작동하려면 cli-config.php 파일이 독트린 명령어를 실행할 프로젝트의 루트 디렉토리에 위치해야 합니다. 이건 상당히 간단한 파일입니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// cli-config.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -278,34 +253,28 @@ doctrine command. Its a fairly simple file:</p>
 <span class="k">return</span> <span class="nx">\Doctrine\ORM\Tools\Console\ConsoleRunner</span><span class="o">::</span><span class="na">createHelperSet</span><span class="p">(</span><span class="nv">$entityManager</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>You can then change into your project directory and call the
-Doctrine command-line tool:</p>
+<p>그러면 프로젝트 폴더 안으로 이동해서 독트린 명령줄 도구를 사용할 수 있습니다.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ cd project/
 $ vendor/bin/doctrine orm:schema-tool:create
 </pre></div>
 </div>
-<p>At this point no entity metadata exists in <cite>src</cite> so you will see a message like
-&#8220;No Metadata Classes to process.&#8221; Don&#8217;t worry, we&#8217;ll create a Product entity and
-corresponding metadata in the next section.</p>
-<p>You should be aware that during the development process you&#8217;ll periodically need
-to update your database schema to be in sync with your Entities metadata.</p>
-<p>You can easily recreate the database:</p>
+<p>이 시점에서 <cite>src</cite>에 엔티티 메타데이터가 없으므로 &#8220;No Metadata Classes to process.&#8221; 라는 메시지가 표시됩니다. 다음 섹션에서 Product 엔티티와 해당 메타데이터를 생성할 것이기 때문에 걱정하지 않으셔도 됩니다.</p>
+<p>개발 프로세스 중에 주기적으로 엔티티 메타데이터와 동기화되도록 데이터베이스 스키마를 업데이트 해야 한다는 점을 잊지 마세요.</p>
+<p>다음과 같이 데이터베이스를 손쉽게 재생성할 수 있습니다.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ vendor/bin/doctrine orm:schema-tool:drop --force
 $ vendor/bin/doctrine orm:schema-tool:create
 </pre></div>
 </div>
-<p>Or use the update functionality:</p>
+<p>혹은 업데이트 기능을 사용할 수 있습니다.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ vendor/bin/doctrine orm:schema-tool:update --force
 </pre></div>
 </div>
-<p>The updating of databases uses a Diff Algorithm for a given
-Database Schema, a cornerstone of the <code class="docutils literal"><span class="pre">Doctrine\DBAL</span></code> package,
-which can even be used without the Doctrine ORM package.</p>
+<p>데이터베이스 업데이트시, 독트린 ORM 패키지 없이도 사용할 수 있는 <code class="docutils literal"><span class="pre">Doctrine\DBAL</span></code> 패키지의 기본 데이터베이스 스키마에 대해 Diff 알고리즘이 사용됩니다.</p>
 </div>
 <div class="section" id="starting-with-the-product">
-<h2>Starting with the Product<a class="headerlink" href="#starting-with-the-product" title="Permalink to this headline">¶</a></h2>
-<p>We start with the simplest entity, the Product. Create a <code class="docutils literal"><span class="pre">src/Product.php</span></code> file to contain the <code class="docutils literal"><span class="pre">Product</span></code>
-entity definition:</p>
+<h2>Product 시작하기<a class="headerlink" href="#starting-with-the-product" title="Permalink to this headline">¶</a></h2>
+<p>우리는 가장 간단한 엔티티 Product부터 시작합니다. <br />
+<code class="docutils literal"><span class="pre">src/Product.php</span></code> 파일을 작성해서 다음의 <code class="docutils literal"><span class="pre">Product</span></code> 엔티티 정의를 포함시키십시오.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/Product.php</span>
 <span class="k">class</span> <span class="nc">Product</span>
@@ -336,23 +305,16 @@ entity definition:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Note that all fields are set to protected (not public) with a
-mutator (getter and setter) defined for every field except $id.
-The use of mutators allows Doctrine to hook into calls which
-manipulate the entities in ways that it could not if you just
-directly set the values with <code class="docutils literal"><span class="pre">entity#field</span> <span class="pre">=</span> <span class="pre">foo;</span></code></p>
-<p>The id field has no setter since, generally speaking, your code
-should not set this value since it represents a database id value.
-(Note that Doctrine itself can still set the value using the
-Reflection API instead of a defined setter function)</p>
-<p>The next step for persistence with Doctrine is to describe the
-structure of the <code class="docutils literal"><span class="pre">Product</span></code> entity to Doctrine using a metadata
-language. The metadata language describes how entities, their
-properties and references should be persisted and what constraints
-should be applied to them.</p>
-<p>Metadata for entities are configured using a XML, YAML or Docblock Annotations.
-This Getting Started Guide will show the mappings for all Mapping Drivers.
-References in the text will be made to the XML mapping.</p>
+<p>$id를 제외한 모든 필드는 변경자(getter,setter mutator)가 정의한 protected (public이 아니라)로 설정된다는 점을 유의하세요. <br />
+변경자를 사용하면 독트린이 엔티티를 조작하는 호출에 연결할 수 있습니다. [주 : 훅을 걸 수 있습니다.] <br />
+이런 기능은 <code class="docutils literal"><span class="pre">entity#field</span> <span class="pre">=</span> <span class="pre">foo;</span></code> 과 같은 방식으로 값을 직접 설정했을 때는 불가능합니다.</p>
+<p>id 필드에는 setter 가 없습니다. 일반적으로 이것은 데이터베이스의 id 값을 가리키기 때문에 설정하는 코드를 짜서는 안됩니다. <br />
+(독트린 자체는 여전히 정의된 setter 함수 대신 Reflection API를 사용하여 값을 설정할 수 있습니다.)</p>
+<p>독트린의 영속성을 위한 다음 단계는 메타데이터 언어를 사용하여 <code class="docutils literal"><span class="pre">Product</span></code> 엔티티의 구조를 독트린에 설명하는 것입니다. <br />
+메타데이터 언어는 엔티티가 속성과 참조가 어떻게 영속적이 되는지, 무엇이 적용에 제한되는지 설명합니다. </p>
+<p>엔티티 메타데이터는 XML, YAML 혹은 파일 내 주석블럭을 사용하여 구성됩니다. <br />
+이 시작 안내서는 모든 매핑 드라이버의 매핑 방법을 보여줍니다. <br />
+텍스트 내부 참조는 XML 매핑으로 만들어집니다. </p>
 <div class="configuration-block">
 <ul class="simple">
 <li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
@@ -406,21 +368,16 @@ References in the text will be made to the XML mapping.</p>
 </li>
 </ul>
 </div>
-<p>The top-level <code class="docutils literal"><span class="pre">entity</span></code> definition tag specifies information about
-the class and table-name. The primitive type <code class="docutils literal"><span class="pre">Product#name</span></code> is
-defined as a <code class="docutils literal"><span class="pre">field</span></code> attribute. The <code class="docutils literal"><span class="pre">id</span></code> property is defined with
-the <code class="docutils literal"><span class="pre">id</span></code> tag, this has a <code class="docutils literal"><span class="pre">generator</span></code> tag nested inside which
-defines that the primary key generation mechanism automatically
-uses the database platforms native id generation strategy (for
-example AUTO INCREMENT in the case of MySql or Sequences in the
-case of PostgreSql and Oracle).</p>
-<p>Now that we have defined our first entity, let&#8217;s update the database:</p>
+<p>최상위 레벨 <code class="docutils literal"><span class="pre">entity</span></code> 정의 태그는 클래스와 테이블 이름 정보를 지정합니다. <br />
+초기 타입 <code class="docutils literal"><span class="pre">Product#name</span></code>은 <code class="docutils literal"><span class="pre">field</span></code> 속성으로 정의됩니다. <br />
+<code class="docutils literal"><span class="pre">id</span></code> 속성은 <code class="docutils literal"><span class="pre">id</span></code> 태그로 정의되는데, 이 태그는 <code class="docutils literal"><span class="pre">generator</span></code>도 갖습니다. 이 <code class="docutils literal"><span class="pre">generator</span></code> 태그는 자동으로 데이터베이스 플랫폼의 네이티브 id 생성 기능을 기본키 생성 메카니즘으로 사용하도록 정의합니다. (예 : Mysql의 AUTO INCREMENT, PostgreSql과 Oracle의 Sequences)
+</p>
+<p>첫 번째 엔티티를 정의했으니, 데이터베이스를 업데이트 해봅시다.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ vendor/bin/doctrine orm:schema-tool:update --force --dump-sql
 </pre></div>
 </div>
-<p>Specifying both flags <code class="docutils literal"><span class="pre">--force</span></code> and <code class="docutils literal"><span class="pre">--dump-sql</span></code> prints and executes the DDL
-statements.</p>
-<p>Now create a new script that will insert products into the database:</p>
+<p><code class="docutils literal"><span class="pre">--force</span></code>와 <code class="docutils literal"><span class="pre">--dump-sql</span></code> 플래그를 모두 지정하고 DDL 구문을 실행합니다.</p>
+<p>이제 데이터베이스에 제품들을 입력하는 스크립트를 작성하겠습니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// create_product.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -436,25 +393,22 @@ statements.</p>
 <span class="k">echo</span> <span class="s2">&quot;Created Product with ID &quot;</span> <span class="o">.</span> <span class="nv">$product</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Call this script from the command-line to see how new products are created:</p>
+<p>CLI에서 이 스크립트를 호출해서 신제품이 생성되는 것을 확인하십시오.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ php create_product.php ORM
 $ php create_product.php DBAL
 </pre></div>
 </div>
-<p>What is happening here? Using the <code class="docutils literal"><span class="pre">Product</span></code> is pretty standard OOP.
-The interesting bits are the use of the <code class="docutils literal"><span class="pre">EntityManager</span></code> service. To
-notify the EntityManager that a new entity should be inserted into the database
-you have to call <code class="docutils literal"><span class="pre">persist()</span></code>. To initiate a transaction to actually perform
-the insertion, You have to explicitly call <code class="docutils literal"><span class="pre">flush()</span></code> on the <code class="docutils literal"><span class="pre">EntityManager</span></code>.</p>
-<p>This distinction between persist and flush is allows to aggregate all writes
-(INSERT, UPDATE, DELETE) into one single transaction, which is executed when
-flush is called. Using this approach the write-performance is significantly
-better than in a scenario where updates are done for each entity in isolation.</p>
-<p>Doctrine follows the UnitOfWork pattern which additionally detects all entities
-that were fetched and have changed during the request. You don&#8217;t have to keep track of
-entities yourself, when Doctrine already knows about them.</p>
-<p>As a next step we want to fetch a list of all the Products. Let&#8217;s create a
-new script for this:</p>
+<p>어떤 일이 벌어졌죠? <code class="docutils literal"><span class="pre">Product</span></code>를 사용한 것은 상당히 OOP 적입니다. <br />
+흥미로운 점은 <code class="docutils literal"><span class="pre">EntityManager</span></code> 서비스를 사용한다는 점입니다. <br />
+EntityManager에게 새로운 엔티티를 데이터베이스에 입력한다는 것을 알리기 위해, <code class="docutils literal"><span class="pre">persist()</span></code>를 호출해야 합니다. <br />
+실제로 트랜잭션을 실행해서 입력하려면, EntityManager상에서 <code class="docutils literal"><span class="pre">flush()</span></code>을 명시하여 호출해야 합니다.
+</p>
+<p>하나의 트랜잭션 안에 모든 작성문(insert,update,delete)를 집계하고, flush가 호출될 때 이를 실행한다는 것이 persist와 flush의 차이점입니다. <br />
+이 접근 방식을 사용하는 것이, 각 엔티티를 개별적으로 업데이트 하는 것보다 성능면에서 낫습니다.</p>
+<p>독트린은 요청 중에 호출되고 변경된 모든 엔티티를 감지하는 작업 단위 패턴을 따릅니다. <br />
+독트린이 이미 감지하고 있기 때문에, 일부러 엔티티를 추적할 필요는 없습니다.</p>
+<p>다음으로 모든 제품 목록을 불러오겠습니다. <br />
+다음 스크립트를 작성하겠습니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// list_products.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -467,10 +421,9 @@ new script for this:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The <code class="docutils literal"><span class="pre">EntityManager#getRepository()</span></code> method can create a finder object (called
-a repository) for every entity. It is provided by Doctrine and contains some
-finder methods such as <code class="docutils literal"><span class="pre">findAll()</span></code>.</p>
-<p>Let&#8217;s continue with displaying the name of a product based on its ID:</p>
+<p><code class="docutils literal"><span class="pre">EntityManager#getRepository()</span></code> 메소드는 모든 엔티티에 대한 파인더 객체(저장소라 불림)를 생성합니다. <br />
+이것은 독트린에서 제공하는 기능이며, <code class="docutils literal"><span class="pre">findAll()</span></code> 과 같은 파인더 메소드가 포함되어 있습니다.</p>
+<p>ID를 기반으로 제품 이름을 표시해보겠습니다.</p> 
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// show_product.php &lt;id&gt;</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -486,9 +439,8 @@ finder methods such as <code class="docutils literal"><span class="pre">findAll(
 <span class="k">echo</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">&quot;-%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$product</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">());</span>
 </pre></div>
 </div>
-<p>Updating a product name demonstrates the functionality UnitOfWork of pattern
-discussed before. We only need to find a product entity and all changes to its
-properties are written to the database:</p>
+<p>제품 이름을 업데이트해보면 앞에서 설명한 작업 단위 패턴 기능을 알 수 있습니다. <br />
+우리가 그저 제품 엔티티만 찾으면, 그 속성에 대한 모든 변경 사항이 데이터베이스에 기록됩니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// update_product.php &lt;id&gt; &lt;new-name&gt;</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -508,14 +460,15 @@ properties are written to the database:</p>
 <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>After calling this script on one of the existing products, you can verify the
-product name changed by calling the <code class="docutils literal"><span class="pre">show_product.php</span></code> script.</p>
+<p>이 스크립트로 이미 존재하는 제품 하나를 호출한 후 , <code class="docutils literal"><span class="pre">show_product.php</span></code>를 사용하여 제품 이름이 변경되었음을 확인할 수 있습니다.</p>
 </div>
 <div class="section" id="adding-bug-and-user-entities">
-<h2>Adding Bug and User Entities<a class="headerlink" href="#adding-bug-and-user-entities" title="Permalink to this headline">¶</a></h2>
-<p>We continue with the bug tracker domain, by creating the missing classes
-<code class="docutils literal"><span class="pre">Bug</span></code>  and <code class="docutils literal"><span class="pre">User</span></code> and putting them into <code class="docutils literal"><span class="pre">src/Bug.php</span></code> and
-<code class="docutils literal"><span class="pre">src/User.php</span></code> respectively.</p>
+<h2>버그 및 사용자 엔티티 추가하기<a class="headerlink" href="#adding-bug-and-user-entities" title="Permalink to this headline">¶</a></h2>
+
+<p>버그 추적기 개발을 계속하기 위해,
+<code class="docutils literal"><span class="pre">Bug</span></code>와 <code class="docutils literal"><span class="pre">User</span></code>가 없는 클래스를 생성하여, 그것들을 각각 <code class="docutils literal"><span class="pre">src/Bug.php</span></code> 와
+<code class="docutils literal"><span class="pre">src/User.php</span></code>에 입력합니다.</p>
+
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/Bug.php</span>
 <span class="sd">/**</span>
@@ -616,6 +569,7 @@ product name changed by calling the <code class="docutils literal"><span class="
 <span class="p">}</span>
 </pre></div>
 </div>
+<p></p>
 <p>All of the properties discussed so far are simple string and integer values,
 for example the id fields of the entities, their names, description, status and
 change dates. Next we will model the dynamic relationships between the entities

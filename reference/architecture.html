@@ -114,179 +114,124 @@ READTHEDOCS_DATA['source_suffix'] = '.rst'
               <div class="body" >
                 
   <div class="section" id="architecture">
-<h1>1. Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h1>
-<p>This chapter gives an overview of the overall architecture,
-terminology and constraints of Doctrine 2. It is recommended to
-read this chapter carefully.</p>
+<h1>1. 아키텍쳐<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h1>
+<p>이 장에서는 독트린 2의 아키텍쳐 전반, 용어, 제약 조건을 개략적으로 설명합니다. 이 장을 주의 깊이 읽을 것을 권합니다.</p>
 <div class="section" id="using-an-object-relational-mapper">
-<h2>1.1. Using an Object-Relational Mapper<a class="headerlink" href="#using-an-object-relational-mapper" title="Permalink to this headline">¶</a></h2>
-<p>As the term ORM already hints at, Doctrine 2 aims to simplify the
-translation between database rows and the PHP object model. The
-primary use case for Doctrine are therefore applications that
-utilize the Object-Oriented Programming Paradigm. For applications
-that do not primarily work with objects Doctrine 2 is not suited very
-well.</p>
+<h2>1.1. 객체 관계형 매퍼의 사용<a class="headerlink" href="#using-an-object-relational-mapper" title="Permalink to this headline">¶</a></h2>
+<p>ORM 이라는 용어에서 알 수 있듯이, 독트린 2의 목표는 데이터베이스 행들과 PHP 객체 모델 사이를 단순화 하는 것입니다.<br />
+즉 독트린의 주요 사용 대상은 OOP 패러다임을 활용하는 어플리케이션입니다. <br />
+객체 작업을 주로 사용하지 않는 어플리케이션은 독트린 2에 적합하지 않습니다.</p>
 </div>
 <div class="section" id="requirements">
-<h2>1.2. Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
-<p>Doctrine 2 requires a minimum of PHP 5.4. For greatly improved
-performance it is also recommended that you use APC with PHP.</p>
+<h2>1.2. 요구 사항<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>독트린 2는 최소 PHP 5.4를 필요로 합니다. 훨씬 나은 성능을 위해 PHP와 APC를 함께 사용할 것을 권해 드립니다.</p>
 </div>
 <div class="section" id="doctrine-2-packages">
-<h2>1.3. Doctrine 2 Packages<a class="headerlink" href="#doctrine-2-packages" title="Permalink to this headline">¶</a></h2>
-<p>Doctrine 2 is divided into three main packages.</p>
+<h2>1.3. 독트린 2 패키지<a class="headerlink" href="#doctrine-2-packages" title="Permalink to this headline">¶</a></h2>
+<p>독트린 2는 주요 3개의 패키지로 나눌 수 있습니다.</p>
 <ul class="simple">
-<li>Common</li>
-<li>DBAL (includes Common)</li>
-<li>ORM (includes DBAL+Common)</li>
+<li>공통</li>
+<li>DBAL (공통 포함)</li>
+<li>ORM (DBAL과 공통이 포함)</li>
 </ul>
-<p>This manual mainly covers the ORM package, sometimes touching parts
-of the underlying DBAL and Common packages. The Doctrine code base
-is split in to these packages for a few reasons and they are to...</p>
+<p>이 메뉴얼은 주로 ORM 패키지를 설명하며, 가끔 DBAL과 공통 패키지 하부의 부분도 다룹니다. <br />
+독트린 코드 베이스는 아래와 같은 몇몇 이유들로 이런 패키지들로 나누어집니다.</p>
 <ul class="simple">
-<li>...make things more maintainable and decoupled</li>
-<li>...allow you to use the code in Doctrine Common without the ORM
-or DBAL</li>
-<li>...allow you to use the DBAL without the ORM</li>
+<li>유지 관리와 비결합도를 높이기 위해</li>
+<li>ORM이나 DBAL이 없어도 독트린 공통 패키지를 사용할 수 있게 하기 위해</li>
+<li>ORM없이도 DBAL을 사용할 수 있게 하기 위해</li>
 </ul>
 <div class="section" id="the-common-package">
-<h3>1.3.1. The Common Package<a class="headerlink" href="#the-common-package" title="Permalink to this headline">¶</a></h3>
-<p>The Common package contains highly reusable components that have no
-dependencies beyond the package itself (and PHP, of course). The
-root namespace of the Common package is <code class="docutils literal"><span class="pre">Doctrine\Common</span></code>.</p>
+<h3>1.3.1. 공통 패키지<a class="headerlink" href="#the-common-package" title="Permalink to this headline">¶</a></h3>
+<p>공통 패키지에는 자체 패키지(와 당연히 PHP)외에는 의존하지 않는 재사용성이 뛰어난 컴포넌트들이 포함되어 있습니다.<br />
+공통 패키지의 루트 네임 스페이스는 <code class="docutils literal"><span class="pre">Doctrine\Common</span></code> 입니다.</p>
 </div>
 <div class="section" id="the-dbal-package">
-<h3>1.3.2. The DBAL Package<a class="headerlink" href="#the-dbal-package" title="Permalink to this headline">¶</a></h3>
-<p>The DBAL package contains an enhanced database abstraction layer on
-top of PDO but is not strongly bound to PDO. The purpose of this
-layer is to provide a single API that bridges most of the
-differences between the different RDBMS vendors. The root namespace
-of the DBAL package is <code class="docutils literal"><span class="pre">Doctrine\DBAL</span></code>.</p>
+<h3>1.3.2. DBAL 패키지<a class="headerlink" href="#the-dbal-package" title="Permalink to this headline">¶</a></h3>
+<p>DBAL 패키지는 PDO 위에 향상된 데이터베이스 추상화 계층(layer)을 포함하지만, PDO에 강하게 결합되어 있지는 않습니다.<br />
+이 계층의 목적은 다른 RDBMS 벤더 간의 차이점을 연결해주는 단일 API를 제공하는 것입니다.<br />
+DBAL 패키지의 루트 네임스페이스는 <code class="docutils literal"><span class="pre">Doctrine\DBAL</span></code> 입니다.</p>
 </div>
 <div class="section" id="the-orm-package">
-<h3>1.3.3. The ORM Package<a class="headerlink" href="#the-orm-package" title="Permalink to this headline">¶</a></h3>
-<p>The ORM package contains the object-relational mapping toolkit that
-provides transparent relational persistence for plain PHP objects.
-The root namespace of the ORM package is <code class="docutils literal"><span class="pre">Doctrine\ORM</span></code>.</p>
+<h3>1.3.3. ORM 패키지<a class="headerlink" href="#the-orm-package" title="Permalink to this headline">¶</a></h3>
+<p>
+ORM 패키지에는 일반 PHP 객체에 대한 투명한 관계형 영속성을 제공하는 객체 관계형 매핑 툴킷이 포함되어 있습니다. <br />
+ORM 패키지의 루트 네임 스페이스는 <code class="docutils literal"><span class="pre">Doctrine\ORM</span></code> 입니다.</p>
 </div>
 </div>
 <div class="section" id="terminology">
-<h2>1.4. Terminology<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
+<h2>1.4. 용어<a class="headerlink" href="#terminology" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="entities">
-<h3>1.4.1. Entities<a class="headerlink" href="#entities" title="Permalink to this headline">¶</a></h3>
-<p>An entity is a lightweight, persistent domain object. An entity can
-be any regular PHP class observing the following restrictions:</p>
+<h3>1.4.1. 엔티티<a class="headerlink" href="#entities" title="Permalink to this headline">¶</a></h3>
+<p>엔티티는 가볍고 영속적인 도메인 객체입니다.<br />
+엔티티는 다음 제한 사항을 준수하는 모든 일반 PHP 클래스가 될 수 있습니다.</p>
 <ul class="simple">
-<li>An entity class must not be final or contain final methods.</li>
-<li>All persistent properties/field of any entity class should
-always be private or protected, otherwise lazy-loading might not
-work as expected. In case you serialize entities (for example Session)
-properties should be protected (See Serialize section below).</li>
-<li>An entity class must not implement <code class="docutils literal"><span class="pre">__clone</span></code> or
-<a class="reference internal" href="../cookbook/implementing-wakeup-or-clone.html"><span class="doc">do so safely</span></a>.</li>
-<li>An entity class must not implement <code class="docutils literal"><span class="pre">__wakeup</span></code> or
-<a class="reference internal" href="../cookbook/implementing-wakeup-or-clone.html"><span class="doc">do so safely</span></a>.
-Also consider implementing
-<a class="reference external" href="http://php.net/manual/en/class.serializable.php">Serializable</a>
-instead.</li>
-<li>Any two entity classes in a class hierarchy that inherit
-directly or indirectly from one another must not have a mapped
-property with the same name. That is, if B inherits from A then B
-must not have a mapped field with the same name as an already
-mapped field that is inherited from A.</li>
-<li>An entity cannot make use of func_get_args() to implement variable parameters.
-Generated proxies do not support this for performance reasons and your code might
-actually fail to work when violating this restriction.</li>
+<li>엔티티 클래스는 최종 클래스이거나 최종 메소드를 포함하지 않아야합니다.</li>
+<li>모든 엔티티 클래스의 모든 영속 properties/field 는 private 혹은 protected 여야 합니다. <br />
+그렇지 않으면 '게으른 로딩(Lazy loading)이 예상대로 작동하지 않을 수 있습니다.'<br />
+엔티티를 serialize 하는 경우 (예를 들면 세션) properties는 protected 되어 있어야 합니다. (아래의 Serialize 섹션 참조).</li>
+<li>엔티티 클래스는 <code class="docutils literal"><span class="pre">__clone</span></code>을 구현하거나 <a class="reference internal" href="../cookbook/implementing-wakeup-or-clone.html"><span class="doc">이렇게</span></a> 하면 안됩니다.</li>
+<li>엔티티 클래스는 <code class="docutils literal"><span class="pre">__wakeup</span></code>을 구현하거나
+<a class="reference internal" href="../cookbook/implementing-wakeup-or-clone.html"><span class="doc">이렇게</span></a> 하면 안됩니다.
+대신 <a class="reference external" href="http://php.net/manual/en/class.serializable.php">Serializable</a> 구현을 고려할 수 있습니다.</li>
+<li>두 엔티티 클래스가 서로 직간접적으로 상속되는 클래스 계층에 잇다면, 같은 이름으로 매핑된 property를 사용할 수 없습니다.<br />
+만약 B가 A를 상속한 경우, B는 A에서 이미 매핑되어 상속된 필드와 같은 이름의 매핑 필드를 사용할 수 없습니다.<br /></li>
+<li>엔티티는 func_get_args()를 사용하여 변수 패러미터를 구현할 수 없습니다.<br />
+생성된 프록시가 성능상의 이유로 이 기능을 지원하지 않기 때문에, 이 제한을 위반할 때 코드가 실제로 작동하지 않을 수 있습니다.</li>
 </ul>
-<p>Entities support inheritance, polymorphic associations, and
-polymorphic queries. Both abstract and concrete classes can be
-entities. Entities may extend non-entity classes as well as entity
-classes, and non-entity classes may extend entity classes.</p>
+<p>엔티티는 상속, 다형성 연결, 다형성 쿼리를 지원합니다.<br />
+추상 클래스와 구상 클래스(concrete class) 모두 엔티티로 사용할 수 있습니다.<br />
+엔티티는 엔티티 클래스는 물론, 비-엔티티 클래스로 확장할 수 있으며, 비-엔티티 클래스도 엔티티 클래스로 확장할 수 있습니다.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The constructor of an entity is only ever invoked when
-<em>you</em> construct a new instance with the <em>new</em> keyword. Doctrine
-never calls entity constructors, thus you are free to use them as
-you wish and even have it require arguments of any type.</p>
+<p class="first admonition-title">노트</p>
+<p class="last">
+엔티티의 생성자는 <em>사용자</em>가 <em>new</em> 키워드로 새 인스턴스를 생성 할 때만 호출됩니다. <br />
+독트린이 엔티티 생성자를 호출하는 일은 없기 때문에, 사용자는 원하는데로 그것을 사용할 수 있는데, 어느 타입의 인수를 요구하든지 상관 없이 그렇습니다.</p>
 </div>
 </div>
 <div class="section" id="entity-states">
-<h3>1.4.2. Entity states<a class="headerlink" href="#entity-states" title="Permalink to this headline">¶</a></h3>
-<p>An entity instance can be characterized as being NEW, MANAGED,
-DETACHED or REMOVED.</p>
+<h3>1.4.2. 엔티티 상태<a class="headerlink" href="#entity-states" title="Permalink to this headline">¶</a></h3>
+<p>엔티티 인스턴스는 NEW, MANAGED, DETACHED, REMOVED 특성화될 수 있습니다.</p>
 <ul class="simple">
-<li>A NEW entity instance has no persistent identity, and is not yet
-associated with an EntityManager and a UnitOfWork (i.e. those just
-created with the &#8220;new&#8221; operator).</li>
-<li>A MANAGED entity instance is an instance with a persistent
-identity that is associated with an EntityManager and whose
-persistence is thus managed.</li>
-<li>A DETACHED entity instance is an instance with a persistent
-identity that is not (or no longer) associated with an
-EntityManager and a UnitOfWork.</li>
-<li>A REMOVED entity instance is an instance with a persistent
-identity, associated with an EntityManager, that will be removed
-from the database upon transaction commit.</li>
+<li>NEW 엔티티는 영속되는 고유성이 없고, EntityManager와 UnitOfWork(즉, new 연산자로 생성된 것들) 와도 연결되어 있지 않습니다.</li>
+<li>MANAGED 엔티티 인스턴스는 EntityManager와 연결된 영속적인 고유성을 띄고 있습니다. 그 영속성도 관리됩니다.</li>
+<li>DETACHED 엔티티 인스턴스는 EntityManager나 UnitOfWork 와 연결되지 않았거나, 더는 연결되지 않는 영속적인 고유성을 띄고 있습니다.</li>
+<li>REMOVED 엔티티 인스턴스는 EntityManager에 연결되어 있지만, 트랜젝션 commit할 때 데이터베이스에서 제거 될 예정인, 영속적인 고유성을 띄고 있습니다.</li>
 </ul>
 </div>
 <div class="section" id="persistent-fields">
-<span id="architecture-persistent-fields"></span><h3>1.4.3. Persistent fields<a class="headerlink" href="#persistent-fields" title="Permalink to this headline">¶</a></h3>
-<p>The persistent state of an entity is represented by instance
-variables. An instance variable must be directly accessed only from
-within the methods of the entity by the entity instance itself.
-Instance variables must not be accessed by clients of the entity.
-The state of the entity is available to clients only through the
-entity’s methods, i.e. accessor methods (getter/setter methods) or
-other business methods.</p>
-<p>Collection-valued persistent fields and properties must be defined
-in terms of the <code class="docutils literal"><span class="pre">Doctrine\Common\Collections\Collection</span></code>
-interface. The collection implementation type may be used by the
-application to initialize fields or properties before the entity is
-made persistent. Once the entity becomes managed (or detached),
-subsequent access must be through the interface type.</p>
+<span id="architecture-persistent-fields"></span><h3>1.4.3. 영속 필드<a class="headerlink" href="#persistent-fields" title="Permalink to this headline">¶</a></h3>
+<p>엔티티의 영속 상태는 인스턴스 변수로 표현됩니다. <br />
+인스턴스 변수는 엔티티 인스턴스 자체 메소드에서만 직접 접근해야 합니다.<br />
+인스턴스 변수는 엔티티 클라이언트에서 접근해서는 안됩니다.<br />
+엔티티의 상태는 엔티티 메소드 즉, 접근자 메소드 (getter,setter 메소드)나 다른 비즈니스 메소드를 통해서만 클라이언트 접근이 가능합니다.</p>
+<p>콜렉션 값을 갖는 영속적 필드와 속성은 <code class="docutils literal"><span class="pre">Doctrine\Common\Collections\Collection</span></code> 인터페이스 하에서 정의되어야 합니다.<br />
+콜렉션 구현 유형은, 엔티티가 영속성을 띄기 전에, 어플리케이션이 필드나 속성을 초기화하기 위해 사용될 수 있습니다.<br />
+엔티티가 MANAGED나 DETACHED 되면 이후에는 인터페이스 유형을 통해서 액세스 해야 합니다.<br /></p>
 </div>
 <div class="section" id="serializing-entities">
-<h3>1.4.4. Serializing entities<a class="headerlink" href="#serializing-entities" title="Permalink to this headline">¶</a></h3>
-<p>Serializing entities can be problematic and is not really
-recommended, at least not as long as an entity instance still holds
-references to proxy objects or is still managed by an
-EntityManager. If you intend to serialize (and unserialize) entity
-instances that still hold references to proxy objects you may run
-into problems with private properties because of technical
-limitations. Proxy objects implement <code class="docutils literal"><span class="pre">__sleep</span></code> and it is not
-possible for <code class="docutils literal"><span class="pre">__sleep</span></code> to return names of private properties in
-parent classes. On the other hand it is not a solution for proxy
-objects to implement <code class="docutils literal"><span class="pre">Serializable</span></code> because Serializable does not
-work well with any potential cyclic object references (at least we
-did not find a way yet, if you did, please contact us).</p>
+<h3>1.4.4. 엔티티 시리얼라이징 (직렬화)<a class="headerlink" href="#serializing-entities" title="Permalink to this headline">¶</a></h3>
+<p>엔티티 시리얼라이징은 문제를 발생시킬 수 있고, 엔티티 인스턴스가 프록시 오브젝트를 참조하고 있거나, EntityManager에 관리되고 있는한 실제로 권장하지 않습니다.<br />
+프록시 객체를 참조하고 있는 엔티티 인스턴스를 시리얼라이징 (혹은 언시리얼라이징) 하려고 하는 경우, 기술적 한계로 인해 private 속성 문제가 발생합니다.<br />
+프록시 객체는 <code class="docutils literal"><span class="pre">__sleep</span></code>를 구현하며, <code class="docutils literal"><span class="pre">__sleep</span></code>가 구현될 때 부모 클래스에서 private 속성명을 반환할 수 없습니다.<br />
+한편, 시리얼라이징은 잠재적 순환 객체 참조와 잘 작동하지 않기 때문에, 이건 프록시 객체가 시리얼라이징을 구현하기 위한 솔루션이 아닙니다. (어쩌면 우리가 방법을 찾기 못했기 때문일 수 있으니, 혹시 방법을 찾으시면 알려주세요)</p>
 </div>
 <div class="section" id="the-entitymanager">
-<h3>1.4.5. The EntityManager<a class="headerlink" href="#the-entitymanager" title="Permalink to this headline">¶</a></h3>
-<p>The <code class="docutils literal"><span class="pre">EntityManager</span></code> class is a central access point to the ORM
-functionality provided by Doctrine 2. The <code class="docutils literal"><span class="pre">EntityManager</span></code> API is
-used to manage the persistence of your objects and to query for
-persistent objects.</p>
+<h3>1.4.5. EntityManager<a class="headerlink" href="#the-entitymanager" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">EntityManager</span></code> 클래스는 독트린 2에서 제공하는 ORM 기능에 대한 중앙 접근점입니다.<br />
+<code class="docutils literal"><span class="pre">EntityManager</span></code> API는 객체의 영속성을 관리하고 영속 객체를 쿼리하기 위해 사용됩니다.</p>
 </div>
 <div class="section" id="transactional-write-behind">
-<h3>1.4.6. Transactional write-behind<a class="headerlink" href="#transactional-write-behind" title="Permalink to this headline">¶</a></h3>
-<p>An <code class="docutils literal"><span class="pre">EntityManager</span></code> and the underlying <code class="docutils literal"><span class="pre">UnitOfWork</span></code> employ a
-strategy called &#8220;transactional write-behind&#8221; that delays the
-execution of SQL statements in order to execute them in the most
-efficient way and to execute them at the end of a transaction so
-that all write locks are quickly released. You should see Doctrine
-as a tool to synchronize your in-memory objects with the database
-in well defined units of work. Work with your objects and modify
-them as usual and when you&#8217;re done call <code class="docutils literal"><span class="pre">EntityManager#flush()</span></code>
-to make your changes persistent.</p>
+<h3>1.4.6. 쓰기 지연 (Transactional write-behind)<a class="headerlink" href="#transactional-write-behind" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">EntityManager</span></code>와 <code class="docutils literal"><span class="pre">UnitOfWork</span></code>는 "쓰기 지연"이라 불리는 SQL문 실행을 지연시키는 방법을 사용하여, 가장 효율적인 방법으로 실행시키고, 트랜젝션 끝에 모든 쓰기 잠금이 신속히 풀리도록 합니다.<br />
+독트린은 잘 정의된 작업 단위로 인메모리 객체와 데이터베이스를 동기화하는 도구입니다.<br />
+객체에 대한 작업을 하고 평소처럼 수정하고 <code class="docutils literal"><span class="pre">EntityManager#flush()</span></code>를 호출하여 변경 사항을 영속적으로 적용합니다.</p>
 </div>
 <div class="section" id="the-unit-of-work">
-<h3>1.4.7. The Unit of Work<a class="headerlink" href="#the-unit-of-work" title="Permalink to this headline">¶</a></h3>
-<p>Internally an <code class="docutils literal"><span class="pre">EntityManager</span></code> uses a <code class="docutils literal"><span class="pre">UnitOfWork</span></code>, which is a
-typical implementation of the
-<a class="reference external" href="http://martinfowler.com/eaaCatalog/unitOfWork.html">Unit of Work pattern</a>,
-to keep track of all the things that need to be done the next time
-<code class="docutils literal"><span class="pre">flush</span></code> is invoked. You usually do not directly interact with a
-<code class="docutils literal"><span class="pre">UnitOfWork</span></code> but with the <code class="docutils literal"><span class="pre">EntityManager</span></code> instead.</p>
+<h3>1.4.7. 작업 단위<a class="headerlink" href="#the-unit-of-work" title="Permalink to this headline">¶</a></h3>
+<p>내부적으로 <code class="docutils literal"><span class="pre">EntityManager</span></code>는 <code class="docutils literal"><span class="pre">UnitOfWork</span></code>를 사용합니다. <br />
+<code class="docutils literal"><span class="pre">UnitOfWork</span></code>는 다음 번 <code class="docutils literal"><span class="pre">flush</span></code> 적용 할 때 수행해야 하는 모든 작업을 추적하는 <a class="reference external" href="http://martinfowler.com/eaaCatalog/unitOfWork.html">작업 단위 패턴</a>을 일반적으로 구현한 것입니다.<br />
+일반적으로 <code class="docutils literal"><span class="pre">EntityManager</span></code> 대신 <code class="docutils literal"><span class="pre">UnitOfWork</span></code>을 직접 사용하게 되지는 않을 것입니다.</p>
 </div>
 </div>
 </div>
@@ -319,23 +264,23 @@ to keep track of all the things that need to be done the next time
             </div>
             <h3><a href="../index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference internal" href="#">1. Architecture</a><ul>
-<li><a class="reference internal" href="#using-an-object-relational-mapper">1.1. Using an Object-Relational Mapper</a></li>
-<li><a class="reference internal" href="#requirements">1.2. Requirements</a></li>
-<li><a class="reference internal" href="#doctrine-2-packages">1.3. Doctrine 2 Packages</a><ul>
-<li><a class="reference internal" href="#the-common-package">1.3.1. The Common Package</a></li>
-<li><a class="reference internal" href="#the-dbal-package">1.3.2. The DBAL Package</a></li>
-<li><a class="reference internal" href="#the-orm-package">1.3.3. The ORM Package</a></li>
+<li><a class="reference internal" href="#">1. 아키텍쳐</a><ul>
+<li><a class="reference internal" href="#using-an-object-relational-mapper">1.1. 객체 관계형 매퍼의 사용</a></li>
+<li><a class="reference internal" href="#requirements">1.2. 요구 사항</a></li>
+<li><a class="reference internal" href="#doctrine-2-packages">1.3. 독트린 2 패키지</a><ul>
+<li><a class="reference internal" href="#the-common-package">1.3.1. 공통 패키지</a></li>
+<li><a class="reference internal" href="#the-dbal-package">1.3.2. DBAL 패키지</a></li>
+<li><a class="reference internal" href="#the-orm-package">1.3.3. ORM 패키지</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#terminology">1.4. Terminology</a><ul>
-<li><a class="reference internal" href="#entities">1.4.1. Entities</a></li>
-<li><a class="reference internal" href="#entity-states">1.4.2. Entity states</a></li>
-<li><a class="reference internal" href="#persistent-fields">1.4.3. Persistent fields</a></li>
-<li><a class="reference internal" href="#serializing-entities">1.4.4. Serializing entities</a></li>
-<li><a class="reference internal" href="#the-entitymanager">1.4.5. The EntityManager</a></li>
-<li><a class="reference internal" href="#transactional-write-behind">1.4.6. Transactional write-behind</a></li>
-<li><a class="reference internal" href="#the-unit-of-work">1.4.7. The Unit of Work</a></li>
+<li><a class="reference internal" href="#terminology">1.4. 용어</a><ul>
+<li><a class="reference internal" href="#entities">1.4.1. 엔티티</a></li>
+<li><a class="reference internal" href="#entity-states">1.4.2. 엔티티 상태</a></li>
+<li><a class="reference internal" href="#persistent-fields">1.4.3. 영속 필드</a></li>
+<li><a class="reference internal" href="#serializing-entities">1.4.4. 엔티티 시리얼라이징 (직렬화)</a></li>
+<li><a class="reference internal" href="#the-entitymanager">1.4.5. EntityManager</a></li>
+<li><a class="reference internal" href="#transactional-write-behind">1.4.6. 쓰기 지연 (Transactional write-behind)</a></li>
+<li><a class="reference internal" href="#the-unit-of-work">1.4.7. 작업 단위</a></li>
 </ul>
 </li>
 </ul>
