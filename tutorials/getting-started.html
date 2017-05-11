@@ -569,28 +569,22 @@ EntityManager에게 새로운 엔티티를 데이터베이스에 입력한다는
 <span class="p">}</span>
 </pre></div>
 </div>
-<p></p>
-<p>All of the properties discussed so far are simple string and integer values,
-for example the id fields of the entities, their names, description, status and
-change dates. Next we will model the dynamic relationships between the entities
-by defining the references between entities.</p>
-<p>References between objects are foreign keys in the database. You never have to
-(and never should) work with the foreign keys directly, only with the objects
-that represent the foreign key through their own identity.</p>
-<p>For every foreign key you either have a Doctrine ManyToOne or OneToOne
-association. On the inverse sides of these foreign keys you can have
-OneToMany associations. Obviously you can have ManyToMany associations
-that connect two tables with each other through a join table with
-two foreign keys.</p>
-<p>Now that you know the basics about references in Doctrine, we can extend the
-domain model to match the requirements:</p>
+<p>지금까지 살펴본 모든 속성은 엔티티의 id 필드, 이름, 설명, 상태, 변경 날짜 등의 간단한 문자열 및 숫자 값이었습니다. <br />
+다음으로 엔티티 간의 참조를 정의하여 엔티티 간의 동적 관계를 모델화합니다.</p>
+<p>객체 간의 참조는 데이터베이스의 외래 키입니다. <br />
+외래 키를 직접 조작 할 필요도 없고 그렇게 해서도 안됩니다. <br />
+고유 identity를 통한 외래키를 대표하는 객체를 사용하면 됩니다.
+ </p>
+ <p>모든 외래 키에 대해 Doctrine ManyToOne 또는 OneToOne 연결을 사용할 수 있습니다. <br />이 외래 키의 반대편에서는 OneToMany 연결을 사용할 수 있습니다. <br />
+ 두 개의 테이블이 각각의 외래키로 상대 테이블을 join 할 때는 ManyToMany 연결을 사용할 수 있습니다.</p>
+ <p>이제 독트린의 참조 기본 사항을 알게 되었습니다. 이제 요구 사항에 맞게 도메인 모델을 확장 해보겠습니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/Bug.php</span>
 <span class="k">use</span> <span class="nx">Doctrine\Common\Collections\ArrayCollection</span><span class="p">;</span>
 
 <span class="k">class</span> <span class="nc">Bug</span>
 <span class="p">{</span>
-    <span class="c1">// ... (previous code)</span>
+    <span class="c1">// ... (이전 코드)</span>
 
     <span class="k">protected</span> <span class="nv">$products</span><span class="p">;</span>
 
@@ -606,7 +600,7 @@ domain model to match the requirements:</p>
 <span class="k">use</span> <span class="nx">Doctrine\Common\Collections\ArrayCollection</span><span class="p">;</span>
 <span class="k">class</span> <span class="nc">User</span>
 <span class="p">{</span>
-    <span class="c1">// ... (previous code)</span>
+    <span class="c1">// ... (이전 코드)</span>
 
     <span class="k">protected</span> <span class="nv">$reportedBugs</span><span class="p">;</span>
     <span class="k">protected</span> <span class="nv">$assignedBugs</span><span class="p">;</span>
@@ -619,66 +613,46 @@ domain model to match the requirements:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>You use Doctrine&#8217;s ArrayCollections in your Doctrine models, rather
-than plain PHP arrays, so that Doctrine can watch what happens with
-them and act appropriately.  Note that if you dump your entities,
-you&#8217;ll see a &#8220;PersistentCollection&#8221; in place of your ArrayCollection,
-which is just an
-internal Doctrine class with the same interface.</p>
+<p>독트린 모델에서 PHP 일반 배열 대신 독트린의 ArrayCollection을 사용하면, 독트린은 내부가 어떻게 작동하는지 지켜보면서, 알맞게 실행됩니다. <br />
+엔티티를 덤프하면 ArrayCollection 대신 "PersistentCollection"이 나온다는 점을 유의하세요. <br />
+ArrayCollection은 동일한 인터페이스를 사용하는 독트린 내부 클래스입니다.</p>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">Lazy load proxies always contain an instance of
-Doctrine&#8217;s EntityManager and all its dependencies. Therefore a
-var_dump() will possibly dump a very large recursive structure
-which is impossible to render and read. You have to use
-<code class="docutils literal"><span class="pre">Doctrine\Common\Util\Debug::dump()</span></code> to restrict the dumping to a
-human readable level. Additionally you should be aware that dumping
-the EntityManager to a Browser may take several minutes, and the
-Debug::dump() method just ignores any occurrences of it in Proxy
-instances.</p>
+<p class="first admonition-title">경고</p>
+<p class="last">지연 로드 프록시는 항상 독트린의 EntityManager 인스턴스와 모든 종속성을 포함합니다. <br />
+따라서 var_dump() 명령어는 렌더링하거나 읽을 수 없을 정도로 아주 큰 재귀적 구조를 덤프하게됩니다. <br />
+사람이 읽을 수 있을 정도로 제한된 덤핑을 하려면 <code class="docutils literal"><span class="pre">Doctrine\Common\Util\Debug::dump()</span></code> 를 사용해야 합니다. <br />
+또한 EntityManager를 브라우저로 덤핑하려면 몇 분정도 걸릴 수 있으며, Debug::dump() 메소드는 프록시 인스턴스에서 EntityManager의 존재를 무시한다는 점에 유의해야 합니다.
+</p>
 </div>
-<p>Because we only work with collections for the references we must be
-careful to implement a bidirectional reference in the domain model.
-The concept of owning or inverse side of a relation is central to
-this notion and should always be kept in mind. The following
-assumptions are made about relations and have to be followed to be
-able to work with Doctrine 2. These assumptions are not unique to
-Doctrine 2 but are best practices in handling database relations
-and Object-Relational Mapping.</p>
+<p>우리는 참조용 콜렉션에 대해서만 작업하기 때문에, 도메인 모델에서 양방향 참조를 구현할 때 조심해야 합니다.<br>
+참조 관계에서 참조하는 측과 참조되는 측이라는 개념은 ORM의 핵심 아이디어이기 때문에, 항상 염두해야 합니다.<br>
+독트린 2의 원할한 작동을 위해서는 다음의 가정들이 전재되어야 합니다.<br>
+다음의 가정들이 독트린 2 고유의 것은 아니지만, 데이터 베이스 및 ORM를 다루는 모범 사례입니다.</p>
+
 <ul class="simple">
-<li>Changes to Collections are saved or updated, when the entity on
-the <em>owning</em> side of the collection is saved or updated.</li>
-<li>Saving an Entity at the inverse side of a relation never
-triggers a persist operation to changes to the collection.</li>
-<li>In a one-to-one relation the entity holding the foreign key of
-the related entity on its own database table is <em>always</em> the owning
-side of the relation.</li>
-<li>In a many-to-many relation, both sides can be the owning side of
-the relation. However in a bi-directional many-to-many relation
-only one is allowed to be.</li>
-<li>In a many-to-one relation the Many-side is the owning side by
-default, because it holds the foreign key.</li>
-<li>The OneToMany side of a relation is inverse by default, since
-the foreign key is saved on the Many side. A OneToMany relation can
-only be the owning side, if its implemented using a ManyToMany
-relation with join table and restricting the one side to allow only
-UNIQUE values per database constraint.</li>
+<li>
+콜렉션에 대한 변경 사항은 컬렉션의 <em>참조하는</em> 쪽 엔티티가 저장되거나 갱신될 때, 저장되거나 갱신됩니다.</li>
+<li>참조 관계에서 참조 되는 쪽에서 엔티티를 저장하는 것으로는, 컬렉션 변경의 영속 운영이 어떤 방식으로든 작동시키지 못합니다.</li>
+<li>One-to-One (1:1) 관계에서는 <em>항상</em> 참조하는 쪽에서 자체 데이터베이스 테이블 관계 엔티티의 외래키를 갖고 있습니다.</li>
+<li>many-to-many (n:n) 관계에서는 양쪽 모두 참조하는 측이 될 수 있습니다. 그러나 양방향 many-to-many 관계에서는 한개만 허가됩니다.</li>
+<li>many-to-one (n:1) 관계에서는 n개 쪽이 외래키를 참조하기 때문에, 기본적으로 n개 측이 참조하는 측이 됩니다.</li>
+<li>OneToMany (1:n) 관계에서는 n개 쪽에 외래키가 저장되기 때문에, 기본적으로 반대입니다. <br />
+단, Join Table을 사용하며, 1개 측에는 데이터베이스 내에서의 UNIQUE(고유)값만 허락 되는 경우에는, OneToMany(1:n) 관계에서 1개 측만 참조 하는 측이 됩니다.</li>
 </ul>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Consistency of bi-directional references on the inverse side of a
-relation have to be managed in userland application code. Doctrine
-cannot magically update your collections to be consistent.</p>
+<p class="first admonition-title">노트</p>
+<p class="last">
+참조 되는 측의 양방향 참조 일관성은 사용자 어플리케이션 코드에서 관리해야 합니다. <br />
+독트린이 마술처럼 일관성있게 컬렉션을 업데이트 해주지는 않습니다.</p>
 </div>
-<p>In the case of Users and Bugs we have references back and forth to
-the assigned and reported bugs from a user, making this relation
-bi-directional. We have to change the code to ensure consistency of
-the bi-directional reference:</p>
+<p>
+사용자와 버그는 앞뒤로 참조 됩니다. 버그를 신고한 유저와 할당받은 유저, 이렇게 양방향 관계입니다. <br />
+코드를 변경해서 양방향 참조의 일관성을 보장해야 합니다. </p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/Bug.php</span>
 <span class="k">class</span> <span class="nc">Bug</span>
 <span class="p">{</span>
-    <span class="c1">// ... (previous code)</span>
+    <span class="c1">// ... (이전 코드)</span>
 
     <span class="k">protected</span> <span class="nv">$engineer</span><span class="p">;</span>
     <span class="k">protected</span> <span class="nv">$reporter</span><span class="p">;</span>
@@ -711,7 +685,7 @@ the bi-directional reference:</p>
 <span class="c1">// src/User.php</span>
 <span class="k">class</span> <span class="nc">User</span>
 <span class="p">{</span>
-    <span class="c1">// ... (previous code)</span>
+    <span class="c1">// ... (이전 코드)</span>
 
     <span class="k">protected</span> <span class="nv">$reportedBugs</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
     <span class="k">protected</span> <span class="nv">$assignedBugs</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
@@ -728,36 +702,28 @@ the bi-directional reference:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>I chose to name the inverse methods in past-tense, which should
-indicate that the actual assigning has already taken place and the
-methods are only used for ensuring consistency of the references.
-This approach is my personal preference, you can choose whatever
-method to make this work.</p>
-<p>You can see from <code class="docutils literal"><span class="pre">User#addReportedBug()</span></code> and
-<code class="docutils literal"><span class="pre">User#assignedToBug()</span></code> that using this method in userland alone
-would not add the Bug to the collection of the owning side in
-<code class="docutils literal"><span class="pre">Bug#reporter</span></code> or <code class="docutils literal"><span class="pre">Bug#engineer</span></code>. Using these methods and
-calling Doctrine for persistence would not update the collections
-representation in the database.</p>
-<p>Only using <code class="docutils literal"><span class="pre">Bug#setEngineer()</span></code> or <code class="docutils literal"><span class="pre">Bug#setReporter()</span></code>
-correctly saves the relation information.</p>
-<p>The <code class="docutils literal"><span class="pre">Bug#reporter</span></code> and <code class="docutils literal"><span class="pre">Bug#engineer</span></code> properties are
-Many-To-One relations, which point to a User. In a normalized
-relational model the foreign key is saved on the Bug&#8217;s table, hence
-in our object-relation model the Bug is at the owning side of the
-relation. You should always make sure that the use-cases of your
-domain model should drive which side is an inverse or owning one in
-your Doctrine mapping. In our example, whenever a new bug is saved
-or an engineer is assigned to the bug, we don&#8217;t want to update the
-User to persist the reference, but the Bug. This is the case with
-the Bug being at the owning side of the relation.</p>
-<p>Bugs reference Products by an uni-directional ManyToMany relation in
-the database that points from Bugs to Products.</p>
+<p>참조 되는 쪽의 이름에는 과거형 변수명을 사용했습니다. 그렇게 해서, 실제로 버그가 할당 되었음을 알려주고, 메소드가 참조의 일관성을 보장하기 위해서만 사용됨을 나타냅니다. <br />
+이 접근 방식은 제 개인적인 취향이기 때문에, 여러분은 메소드명은 알아서 하시면 됩니다. </p>
+<p><code class="docutils literal"><span class="pre">User#addReportedBug()</span></code> 와
+<code class="docutils literal"><span class="pre">User#assignedToBug()</span></code>
+에서 볼 수 있듯이, 사용자 코드에서는 이 메소드를 실행시켜도 <code class="docutils literal"><span class="pre">Bug#reporter</span></code> 나 <code class="docutils literal"><span class="pre">Bug#engineer</span></code>같은 참조하는 쪽의 컬렉션에 버그를 추가시키지 않습니다. <br />  
+즉, 이 메소드를 실행하고, 독트린 호출을 통해 영속성을 부여해도, 데이터베이스의 컬렉션을 업데이트 시키지는 않습니다.
+
+<p><code class="docutils literal"><span class="pre">Bug#setEngineer()</span></code> 나 <code class="docutils literal"><span class="pre">Bug#setReporter()</span></code>를 통해서만 관계 정보가 정확히 저장됩니다.</p>
+<p><code class="docutils literal"><span class="pre">Bug#reporter</span></code> 와 <code class="docutils literal"><span class="pre">Bug#engineer</span></code> 속성은 User 를 참조하는 Many-To-One (n:1)  관계입니다. <br />
+정규화된 관계 모델에서 외래키는 Bug 테이블에 저장됩니다. <br />
+때문에 독트린 ORM에서 Bug 가 참조하는 쪽이 됩니다. <br />
+여러분의 도메인 모델의 사용 사례가 독트린 매핑에서 참조하는 측인지 참조 되는 측인지 항상 확인해야 합니다. <br />
+이 예에서는 새로운 버그가 등록되거나 엔지니어에게 버그가 할당될 때 참조를 유지하기 위해 User 가 아닌 Bug 를 업데이트 합니다. <br />
+이 예는 Bug가 참조하는 쪽에 있는 경우 입니다.
+</p>
+<p>데이터베이스에서 Bug테이블이 Product 테이블을 참조하듯이, Bug는 Product를 단방향 ManyToMany (n:n)으로 참조합니다.
+</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/Bug.php</span>
 <span class="k">class</span> <span class="nc">Bug</span>
 <span class="p">{</span>
-    <span class="c1">// ... (previous code)</span>
+    <span class="c1">// ... (이전 코드)</span>
 
     <span class="k">protected</span> <span class="nv">$products</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
 
@@ -773,9 +739,9 @@ the database that points from Bugs to Products.</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>We are now finished with the domain model given the requirements.
-Lets add metadata mappings for the <code class="docutils literal"><span class="pre">User</span></code> and <code class="docutils literal"><span class="pre">Bug</span></code> as we did for
-the <code class="docutils literal"><span class="pre">Product</span></code> before:</p>
+<p>이제 요구 사항을 충족하는 도메인 모델을 완성했습니다. <br />
+앞에서 <code class="docutils literal"><span class="pre">Product</span></code>에 한 것처럼 
+<code class="docutils literal"><span class="pre">User</span></code> 와 <code class="docutils literal"><span class="pre">Bug</span></code> 에 대한 메타데이터 매핑을 추가합니다.</p>
 <div class="configuration-block">
 <ul class="simple">
 <li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
@@ -877,26 +843,21 @@ the <code class="docutils literal"><span class="pre">Product</span></code> befor
 </li>
 </ul>
 </div>
-<p>Here we have the entity, id and primitive type definitions.
-For the &#8220;created&#8221; field we have used the <code class="docutils literal"><span class="pre">datetime</span></code> type,
-which translates the YYYY-mm-dd HH:mm:ss database format
-into a PHP DateTime instance and back.</p>
-<p>After the field definitions the two qualified references to the
-user entity are defined. They are created by the <code class="docutils literal"><span class="pre">many-to-one</span></code>
-tag. The class name of the related entity has to be specified with
-the <code class="docutils literal"><span class="pre">target-entity</span></code> attribute, which is enough information for
-the database mapper to access the foreign-table. Since
-<code class="docutils literal"><span class="pre">reporter</span></code> and <code class="docutils literal"><span class="pre">engineer</span></code> are on the owning side of a
-bi-directional relation we also have to specify the <code class="docutils literal"><span class="pre">inversed-by</span></code>
-attribute. They have to point to the field names on the inverse
-side of the relationship. We will see in the next example that the <code class="docutils literal"><span class="pre">inversed-by</span></code>
-attribute has a counterpart <code class="docutils literal"><span class="pre">mapped-by</span></code> which makes that
-the inverse side.</p>
-<p>The last definition is for the <code class="docutils literal"><span class="pre">Bug#products</span></code> collection. It
-holds all products where the specific bug occurs. Again
-you have to define the <code class="docutils literal"><span class="pre">target-entity</span></code> and <code class="docutils literal"><span class="pre">field</span></code> attributes
-on the <code class="docutils literal"><span class="pre">many-to-many</span></code> tag.</p>
-<p>The last missing definition is that of the User entity:</p>
+<p>여기서는 엔티티, id 및 초기 타입 정의가 사용 됩니다. <br />
+"created" 필드에 <code class="docutils literal"><span class="pre">datetime</span></code> 타입이 사용되었습니다. <code class="docutils literal"><span class="pre">datetime</span></code>은 YYYY-mm-dd HH:mm:ss 데이타베이스 형식을 PHP DataTime 인스턴스로 상호 변환 가능합니다.</p>
+<p>필드를 정의한 다음으로 사용자 엔티티를 참조하는 두 개의 참조 필드가 정의됩니다. <br />
+이 두 필드는 <code class="docutils literal"><span class="pre">many-to-one</span></code> 태그로 만들어 집니다. <br />
+관련 엔티티의 클래스 이름은 <code class="docutils literal"><span class="pre">target-entity</span></code> 속성으로 선언합니다. <code class="docutils literal"><span class="pre">target-entity</span></code> 만 입력하면 데이터 매퍼가 알아서 외부 테이블에 접근합니다. <br />
+<code class="docutils literal"><span class="pre">reporter</span></code> 와 <code class="docutils literal"><span class="pre">engineer</span></code>는 양방향 연결에서 참조하는 쪽이기 때문에 <code class="docutils literal"><span class="pre">inversed-by</span></code> 속성을 지정해 줍니다. <br />
+<code class="docutils literal"><span class="pre">inversed-by</span></code> 속성들이 참조 관계에서의 참조 되는쪽 필드이름을 가리킵니다. <br />
+다음 예제에서 <code class="docutils literal"><span class="pre">inversed-by</span></code> 속성이 참조 되는 쪽의 <code class="docutils literal"><span class="pre">mapped-by</span></code> 필드에 대응 하는 것을 볼 수 있습니다.
+
+</p>
+<p>마지막 으로 <code class="docutils literal"><span class="pre">Bug#products</span></code> 컬렉션을 정의합니다. 특정 버그가 발생한 모든 제품 정보가 <code class="docutils literal"><span class="pre">Bug#products</span></code> 컬렉션에 저장됩니다. <br />
+<code class="docutils literal"><span class="pre">many-to-many</span></code> 태그에 <code class="docutils literal"><span class="pre">target-entity</span></code> 과 <code class="docutils literal"><span class="pre">field</span></code>  속성도 정의합니다.
+
+</p>
+<p>마지막 남은 정의는 User 엔티티 정의입니다.</p>
 <div class="configuration-block">
 <ul class="simple">
 <li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
@@ -979,22 +940,20 @@ on the <code class="docutils literal"><span class="pre">many-to-many</span></cod
 </li>
 </ul>
 </div>
-<p>Here are some new things to mention about the <code class="docutils literal"><span class="pre">one-to-many</span></code> tags.
-Remember that we discussed about the inverse and owning side. Now
-both reportedBugs and assignedBugs are inverse relations, which
-means the join details have already been defined on the owning
-side. Therefore we only have to specify the property on the Bug
-class that holds the owning sides.</p>
-<p>This example has a fair overview of the most basic features of the
-metadata definition language.</p>
-<p>Update your database running:</p>
+<p><code class="docutils literal"><span class="pre">one-to-many</span></code> 태그의 새로운 점들이 있습니다. <br />
+참조하는 쪽과 참조되는 쪽에 대해 검토한 것을 기억 하시나요? <br />
+reportedBugs와 assignedBugs은 모두 참조되는 쪽입니다. <br /> 
+즉, 상세 join 내역은 이미 참조 하는 쪽에 정의 되어 있습니다. <br />
+때문에 참조하는 쪽인 Bug 클래스에만 속성을 지정하면 됩니다.</p>
+<p>이 예제는 메타 데이터 정의 언어의 가장 기본적인 기능에 대한 개요입니다.</p>
+<p>데이타베이스 업데이트 실행:</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ vendor/bin/doctrine orm:schema-tool:update --force
 </pre></div>
 </div>
 </div>
 <div class="section" id="implementing-more-requirements">
-<h2>Implementing more Requirements<a class="headerlink" href="#implementing-more-requirements" title="Permalink to this headline">¶</a></h2>
-<p>For starters we need to create user entities:</p>
+<h2>더 많은 요구 사항 구현<a class="headerlink" href="#implementing-more-requirements" title="Permalink to this headline">¶</a></h2>
+<p>우선 사용자 엔티티를 만듭니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// create_user.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -1010,12 +969,11 @@ metadata definition language.</p>
 <span class="k">echo</span> <span class="s2">&quot;Created User with ID &quot;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Now call:</p>
+<p>이제 호출해 봅니다.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ php create_user.php beberlei
 </pre></div>
 </div>
-<p>We now have the data to create a bug and the code for this scenario may look
-like this:</p>
+<p>다음의 코드는 버그 생성 데이타를 생성하는 코드 입니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// create_bug.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -1050,29 +1008,21 @@ like this:</p>
 <span class="k">echo</span> <span class="s2">&quot;Your new Bug Id: &quot;</span><span class="o">.</span><span class="nv">$bug</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()</span><span class="o">.</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Since we only have one user and product, probably with the ID of 1, we can call this script with:</p>
+<p>아직 user와 product의 ID가 모두 1 밖에 없기 때문에 스크립트를 아래와 같이 호출합니다.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">php</span> <span class="n">create_bug</span><span class="o">.</span><span class="n">php</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span>
 </pre></div>
 </div>
-<p>This is the first contact with the read API of the EntityManager,
-showing that a call to <code class="docutils literal"><span class="pre">EntityManager#find($name,</span> <span class="pre">$id)</span></code> returns a
-single instance of an entity queried by primary key. Besides this
-we see the persist + flush pattern again to save the Bug into the
-database.</p>
-<p>See how simple relating Bug, Reporter, Engineer and Products is
-done by using the discussed methods in the &#8220;A first prototype&#8221;
-section. The UnitOfWork will detect this relationship when flush is
-called and relate them in the database appropriately.</p>
+<p>처음으로 EntityManager 읽기 API를 사용 하였습니다. <code class="docutils literal"><span class="pre">EntityManager#find($name,</span> <span class="pre">$id)</span></code>를 호출해서 기본키로 불러온 엔티티의 단일 인스턴스가 리턴 되었습니다. <br />
+또한 persist + flush 패턴으로 Bug를 데이타베이스에 저장하였습니다.</p>
+<p>"첫 번째 프로토 타입"에서 검토한 메소드들을 사용하는 것이 Bug, Reporter, Engineer, Product 연결을 얼마나 간단하게 만드는지 보세요. <br />
+UnitOfWork는 flush가 호출될 때 이 참조 관계를 감지하여 데이터베이스 내에서 적절히 참조 관계를 만듭니다.</p>
 </div>
 <div class="section" id="queries-for-application-use-cases">
-<h2>Queries for Application Use-Cases<a class="headerlink" href="#queries-for-application-use-cases" title="Permalink to this headline">¶</a></h2>
+<h2>애플리케이션 사용 사례를 위한 쿼리<a class="headerlink" href="#queries-for-application-use-cases" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="list-of-bugs">
-<h3>List of Bugs<a class="headerlink" href="#list-of-bugs" title="Permalink to this headline">¶</a></h3>
-<p>Using the previous examples we can fill up the database quite a
-bit, however we now need to discuss how to query the underlying
-mapper for the required view representations. When opening the
-application, bugs can be paginated through a list-view, which is
-the first read-only use-case:</p>
+<h3>버그 목록<a class="headerlink" href="#list-of-bugs" title="Permalink to this headline">¶</a></h3>
+<p>앞의 예제만 사용해도 데이터베이스를 채우는데는 문제가 없지만, 기본 매퍼 질의(query)하는 법을 알면 필수적인 뷰를 표현할 수 있습니다. <br />
+애플리케이션을 열 때 첫번째 읽기 전용 사용 사례인 리스트뷰를 통해 버그들에 페이지 번호를 매길 수 있습니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// list_bugs.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -1094,9 +1044,8 @@ the first read-only use-case:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>The DQL Query in this example fetches the 30 most recent bugs with
-their respective engineer and reporter in one single SQL statement.
-The console output of this script is then:</p>
+<p>이 예제의 DQL 쿼리는 30개의 최근 버그들을 각각의 엔지니어와 보고자(reporter)를 단일 SQL문으로 불러옵니다. <br />
+다음은 스크립트의 콘솔 출력입니다.</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>Something does not work! - 02.04.2010
     Reported by: beberlei
     Assigned to: beberlei
@@ -1105,47 +1054,30 @@ The console output of this script is then:</p>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p><strong>DQL is not SQL</strong></p>
-<p>You may wonder why we start writing SQL at the beginning of this
-use-case. Don&#8217;t we use an ORM to get rid of all the endless
-hand-writing of SQL? Doctrine introduces DQL which is best
-described as <strong>object-query-language</strong> and is a dialect of
-<a class="reference external" href="http://en.wikipedia.org/wiki/Object_Query_Language">OQL</a> and
-similar to <a class="reference external" href="http://www.hibernate.org">HQL</a> or
-<a class="reference external" href="http://en.wikipedia.org/wiki/Java_Persistence_Query_Language">JPQL</a>.
-It does not know the concept of columns and tables, but only those
-of Entity-Class and property. Using the Metadata we defined before
-it allows for very short distinctive and powerful queries.</p>
-<p>An important reason why DQL is favourable to the Query API of most
-ORMs is its similarity to SQL. The DQL language allows query
-constructs that most ORMs don&#8217;t: GROUP BY even with HAVING,
-Sub-selects, Fetch-Joins of nested classes, mixed results with
-entities and scalar data such as COUNT() results and much more.
-Using DQL you should seldom come to the point where you want to
-throw your ORM into the dumpster, because it doesn&#8217;t support some
-the more powerful SQL concepts.</p>
-<p>Instead of handwriting DQL you can use the <code class="docutils literal"><span class="pre">QueryBuilder</span></code> retrieved
-by calling <code class="docutils literal"><span class="pre">$entityManager-&gt;createQueryBuilder()</span></code>. There are more
-details about this in the relevant part of the documentation.</p>
-<p class="last">As a last resort you can still use Native SQL and a description of the
-result set to retrieve entities from the database. DQL boils down to a
-Native SQL statement and a <code class="docutils literal"><span class="pre">ResultSetMapping</span></code> instance itself. Using
-Native SQL you could even use stored procedures for data retrieval, or
-make use of advanced non-portable database queries like PostgreSql&#8217;s
-recursive queries.</p>
+<p><strong>DQL 은 SQL 이 아닙니다.</strong></p>
+<p>이 예제를 시작하면서, 왜 굳이 SQL을 작성해야 하는지 궁금할 수 있습니다. <br />
+끝도 없는 SQL 수작업을 없애기 위해서 ORM을 사용했는데 말이죠. <br />
+독트린이 소개하는 DQL을 가장 잘 설명하는 방법은, 이것이 <strong>object-query-language</strong> 이라는 것입니다. DQL은 <a class="reference external" href="http://en.wikipedia.org/wiki/Object_Query_Language">OQL</a>의 파생어이며, <a class="reference external" href="http://www.hibernate.org">HQL</a>이나 <a class="reference external" href="http://en.wikipedia.org/wiki/Java_Persistence_Query_Language">JPQL</a>과 유사합니다.</a>. <br />
+DQL은 컬럼과 테이블이라는 개념대신, 엔티티 클래스와 속성이라는 개념을 사용합니다. <br />
+앞서 정의해 놓은 메타데이터를 사용하면, 짧고 독특하고 강력한 쿼리를 만들어 낼 수 있습니다.</p>
+<p>DQL이 대부분의 ORM API에 비해 나은 중요한 이유는 바로 DQL이 SQL과 비슷하다는 것입니다. <br />
+DQL 언어를 사용하면, 대부분의 ORM 에서는 사용할 수 없는 Group by (심지어 HAVING도 쓸 수 있고), 서브 셀렉트, 중첩 클래스의 Fetch-조인, COUNT() 결과 같은 스칼라 데이터와 엔티티의 혼합 등을 사용할 수 있습니다. <br />
+DQL을 사용하면 더 강력한 SQL 개념을 지원하지 않는다는 이유로 ORM을 집어 치우고 싶은 생각은 좀처럼 들지 않을 것입니다.</p>
+<p>
+DQL을 손으로 타이핑 하는 대신 <code class="docutils literal"><span class="pre">$entityManager-&gt;createQueryBuilder()</span></code>를 호출하여 <code class="docutils literal"><span class="pre">QueryBuilder</span></code> 를 사용할 수 있습니다. <br />
+이에 대한 더 상세한 점은 문서의 관련 부분에서 보실 수 있습니다. </p>
+<p class="last">최후의 수단으로 네이티브 SQL 과 결과 셋의 설명을 사용하여 데이터베이스에서 엔티티를 검색할 수 있습니다. <br />
+DQL을 직접 네이티브 SQL과 <code class="docutils literal"><span class="pre">ResultSetMapping</span></code> 인스턴스로 변형시킬 수 있습니다. <br />
+네이티브 SQL을 사용하면 저장 프로시저를 사용하여 데이터를 검색하거나, PostgreSql의 재귀 쿼리 같은 고급 고유 데이터베이스 기능을 사용할 수 있습니다.</p>
 </div>
 </div>
 <div class="section" id="array-hydration-of-the-bug-list">
-<h3>Array Hydration of the Bug List<a class="headerlink" href="#array-hydration-of-the-bug-list" title="Permalink to this headline">¶</a></h3>
-<p>In the previous use-case we retrieved the results as their
-respective object instances. We are not limited to retrieving
-objects only from Doctrine however. For a simple list view like the
-previous one we only need read access to our entities and can
-switch the hydration from objects to simple PHP arrays instead.</p>
-<p>Hydration can be an expensive process so only retrieving what you need can
-yield considerable performance benefits for read-only requests.</p>
-<p>Implementing the same list view as before using array hydration we
-can rewrite our code:</p>
+<h3>버그 리스트를 배열로 녹여내기<a class="headerlink" href="#array-hydration-of-the-bug-list" title="Permalink to this headline">¶</a></h3>
+<p>우리는 이전의 사용 예제에서 검색하여 각각의 객체 인스턴스로 뽑아내었습니다. <br />
+그렇지만 독트린에서 객체로밖에 검색 할 수 없는 건 아닙니다. <br />
+앞에서 사용한 것처럼 간단한 목록 보기의 경우에는 엔티티에 대한 읽기 접근만 필요하기 때문에, 객체를 간단한 PHP 배열로 변환하여 사용할 수도 있습니다. </p>
+<p>변환에는 조금 더 많은 프로세스가 필요하기 때문에, 필요한 부분만 검색해야 읽기 전용 요청에서 나은 성능을 기대할 수 있습니다.</p>
+<p>배열 녹여내기를 사용하여 우리 코드를 수정해서, 위에서 만든 목록 보기를 구현합니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// list_bugs_array.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -1166,19 +1098,13 @@ can rewrite our code:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>There is one significant difference in the DQL query however, we
-have to add an additional fetch-join for the products connected to
-a bug. The resulting SQL query for this single select statement is
-pretty large, however still more efficient to retrieve compared to
-hydrating objects.</p>
+<p>products에 bug를 연결하기 위해 패치-join을 추가해야 한다는 점이 DQL 쿼리의 중요한 차이점입니다. <br />
+이 단일 select문에 대한 SQL 쿼리는 길지만, 객체 변환해 바하면 더 효율적입니다.</p>
 </div>
 <div class="section" id="find-by-primary-key">
-<h3>Find by Primary Key<a class="headerlink" href="#find-by-primary-key" title="Permalink to this headline">¶</a></h3>
-<p>The next Use-Case is displaying a Bug by primary key. This could be
-done using DQL as in the previous example with a where clause,
-however there is a convenience method on the <code class="docutils literal"><span class="pre">EntityManager</span></code> that
-handles loading by primary key, which we have already seen in the
-write scenarios:</p>
+<h3>기본 키로 찾기<a class="headerlink" href="#find-by-primary-key" title="Permalink to this headline">¶</a></h3>
+<p>다음 사용 사례는 기본 키로 버그를 보여주는 겁니다. <br />
+물론 위에서처럼  DQL을 사용해서 where 구문으로 검색할 수도 있겠지만, <code class="docutils literal"><span class="pre">EntityManager</span></code>에는 우리가 이미 쓰기 기능 만들 때 본 적이 있는 더 편리한 메소드가 있습니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// show_bug.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -1191,13 +1117,10 @@ write scenarios:</p>
 <span class="k">echo</span> <span class="s2">&quot;Engineer: &quot;</span><span class="o">.</span><span class="nv">$bug</span><span class="o">-&gt;</span><span class="na">getEngineer</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span><span class="o">.</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>The output of the engineer’s name is fetched from the database! What is happening?</p>
-<p>Since we only retrieved the bug by primary key both the engineer and reporter
-are not immediately loaded from the database but are replaced by LazyLoading
-proxies. These proxies will load behind the scenes, when the first method
-is called on them.</p>
-<p>Sample code of this proxy generated code can be found in the specified Proxy
-Directory, it looks like:</p>
+<p>엔지지어 이름이 데이터베이스에서 연결되어 있네요. 어떻게 된 걸까요?</p>
+<p>엔지니어와 보고자 정보는 기본키로 버그를 검색할 때 즉시 불러오는 것이 아니라, 지연로딩 프록시에 의해 대체됩니다. <br />
+이 프록시는 첫 메소드가 호출 될 때, 내부적으로 실행됩니다. </p>
+<p>이 프록시 샘플 코드가 만들어내는 아래와 같은 코드는 지정된 프록시 디렉토리에서 찾을 수 있습니다. </p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="k">namespace</span> <span class="nx">MyProject\Proxies</span><span class="p">;</span>
 
@@ -1222,9 +1145,8 @@ Directory, it looks like:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>See how upon each method call the proxy is lazily loaded from the
-database?</p>
-<p>The call prints:</p>
+<p>각 메소드상에서 어떻게 프록시가 데이터베이스 지연 불러오기를 하는지 보셨나요?</p>
+<p>출력을 요청해보죠</p>
 <div class="highlight-default"><div class="highlight"><pre><span></span>$ php show_bug.php 1
 Bug: Something does not work!
 Engineer: beberlei
@@ -1232,19 +1154,15 @@ Engineer: beberlei
 </div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
-<p class="last">Lazy loading additional data can be very convenient but the additional
-queries create an overhead. If you know that certain fields will always
-(or usually) be required by the query then you will get better performance
-by explicitly retrieving them all in the first query.</p>
+<p class="last">추가 데이터 지연 로딩은 대단히 편리하지만, 별도의 쿼리를 만들어 내는 것은 부하를 생산합니다. <br />
+어떤 지정된 필드가 항상 혹은 자주 사용되는지 안다면, 첫 번째 쿼리에 명시하는 것으로 더 나은 성능을 낼 수 있습니다.</p>
 </div>
 </div>
 </div>
 <div class="section" id="dashboard-of-the-user">
-<h2>Dashboard of the User<a class="headerlink" href="#dashboard-of-the-user" title="Permalink to this headline">¶</a></h2>
-<p>For the next use-case we want to retrieve the dashboard view, a
-list of all open bugs the user reported or was assigned to. This
-will be achieved using DQL again, this time with some WHERE clauses
-and usage of bound parameters:</p>
+<h2>사용자 대쉬보드<a class="headerlink" href="#dashboard-of-the-user" title="Permalink to this headline">¶</a></h2>
+<p>다음 사용 예제는, 유저가 보고했거나, 유저에게 할당된 모든 버그 목록을 열어 대쉬보드 뷰에서 검색하도록 하는 겁니다. <br />
+where 구문 몇개와, 바인딩 패러미터를 사용해서 DQL 구문을 만들겁니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// dashboard.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -1268,13 +1186,11 @@ and usage of bound parameters:</p>
 </div>
 </div>
 <div class="section" id="number-of-bugs">
-<h2>Number of Bugs<a class="headerlink" href="#number-of-bugs" title="Permalink to this headline">¶</a></h2>
-<p>Until now we only retrieved entities or their array representation.
-Doctrine also supports the retrieval of non-entities through DQL.
-These values are called &#8220;scalar result values&#8221; and may even be
-aggregate values using COUNT, SUM, MIN, MAX or AVG functions.</p>
-<p>We will need this knowledge to retrieve the number of open bugs
-grouped by product:</p>
+<h2>버그 개수<a class="headerlink" href="#number-of-bugs" title="Permalink to this headline">¶</a></h2>
+<p>지금까지는 엔티티를 검색하거나 그 배열 표현하기만 배웠습니다. <br />
+독트린은 DQL을 사용해서 엔티티가 아닌 것도 검색할 수 있습니다. <br />
+COUNT, SUM, MIN, MAX, AVG 함수 같은 "스칼라 결과 값"이라 불리는 합계값들입니다.</p>
+<p>이걸 알아야 products 별로 오픈된 버그 수를 검색해 낼 수 있습니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// products.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -1290,9 +1206,8 @@ grouped by product:</p>
 </div>
 </div>
 <div class="section" id="updating-entities">
-<h2>Updating Entities<a class="headerlink" href="#updating-entities" title="Permalink to this headline">¶</a></h2>
-<p>There is a single use-case missing from the requirements, Engineers
-should be able to close a bug. This looks like:</p>
+<h2>엔티티들 업데이트 하기<a class="headerlink" href="#updating-entities" title="Permalink to this headline">¶</a></h2>
+<p>요구사항에서 빠진 것이 하나 있는데요, 엔지니어가 버그를 닫을 수 있어야 합니다. 이런식으로 말이죠.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/Bug.php</span>
 
@@ -1317,37 +1232,28 @@ should be able to close a bug. This looks like:</p>
 <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>When retrieving the Bug from the database it is inserted into the
-IdentityMap inside the UnitOfWork of Doctrine. This means your Bug
-with exactly this id can only exist once during the whole request
-no matter how often you call <code class="docutils literal"><span class="pre">EntityManager#find()</span></code>. It even
-detects entities that are hydrated using DQL and are already
-present in the Identity Map.</p>
-<p>When flush is called the EntityManager loops over all the entities
-in the identity map and performs a comparison between the values
-originally retrieved from the database and those values the entity
-currently has. If at least one of these properties is different the
-entity is scheduled for an UPDATE against the database. Only the
-changed columns are updated, which offers a pretty good performance
-improvement compared to updating all the properties.</p>
+<p>데이터베이스에서 버그를 검색할 때, 이것은 독트린 UnitOfWork 내부의 IdentityMap에 입력되어 있습니다. <br />
+즉, 전체 요청 중 얼마나 자주 <code class="docutils literal"><span class="pre">EntityManager#find()</span></code>를 호출하던 관계 없이 정확히 이 id를 가진 버그는 한 번만 존재한다는 의미입니다. <br />
+심지어 DQL을 통해 변환시킨 엔티티, 이미 Identity Map에 존재하는 엔티티 모두 감지합니다. </p>
+<p>flush가 호출될 때, 엔티티매니저는 identity map에 있는 모든 엔티티를 체크해서, 데이터베이스에서 검색된 원본과 현재 엔티티에 적힌 값을 비교시킵니다. <br />
+이런 속성들 중 한개라도 다르면, 엔티티는 데이터베이스 UPDATE를 준비합니다. <br />
+모든 속성을 업데이트 하는 것에 비해 아주 좋은 성능 향상을 제공하는 변경 컬럼만 update 됩니다.</p>
 </div>
 <div class="section" id="entity-repositories">
-<h2>Entity Repositories<a class="headerlink" href="#entity-repositories" title="Permalink to this headline">¶</a></h2>
-<p>For now we have not discussed how to separate the Doctrine query logic from your model.
-In Doctrine 1 there was the concept of <code class="docutils literal"><span class="pre">Doctrine_Table</span></code> instances for this
-separation. The similar concept in Doctrine2 is called Entity Repositories, integrating
-the <a class="reference external" href="http://martinfowler.com/eaaCatalog/repository.html">repository pattern</a> at the heart of Doctrine.</p>
-<p>Every Entity uses a default repository by default and offers a bunch of convenience
-methods that you can use to query for instances of that Entity. Take for example
-our Product entity. If we wanted to Query by name, we can use:</p>
+<h2>엔티티 저장소<a class="headerlink" href="#entity-repositories" title="Permalink to this headline">¶</a></h2>
+<p>모델에서 어떻게 독트린 쿼리 로직을 분리하는지는 아직 다루지 않았습니다. <br />
+독트린 1에서는 <code class="docutils literal"><span class="pre">Doctrine_Table</span></code> 인스턴스 개념으로 분리를 시켰습니다. <br />
+독트린 2의 유사 개념은 엔티티 저장소 인데, 독트린의 심장에 <a class="reference external" href="http://martinfowler.com/eaaCatalog/repository.html">저장소 패턴</a>을 통합시킨 것입니다.</p>
+<p>기본적으로 모든 엔티티는 기본 저장소를 사용하여, 엔티티 인스턴스를 조회하는데 사용할 수 있는, 편리한 여러 메소드들을 제공합니다. <br />
+우리가 작성한 Product 엔티티가 그 예입니다. 만약 이름으로 조회하고 싶으면 이렇게 할 수 있습니다. </p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$product</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">getRepository</span><span class="p">(</span><span class="s1">&#39;Product&#39;</span><span class="p">)</span>
                          <span class="o">-&gt;</span><span class="na">findOneBy</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$productName</span><span class="p">));</span>
 </pre></div>
 </div>
-<p>The method <code class="docutils literal"><span class="pre">findOneBy()</span></code> takes an array of fields or association keys and the values to match against.</p>
-<p>If you want to find all entities matching a condition you can use <code class="docutils literal"><span class="pre">findBy()</span></code>, for
-example querying for all closed bugs:</p>
+<p><code class="docutils literal"><span class="pre">findOneBy()</span></code> 메소드는 필드나 연결 키, 그리고 그 필드나 키에 해당되는 값을 배열로 받습니다.</p>
+<p><code class="docutils literal"><span class="pre">findBy()</span></code> 메소드를 사용하면, 조건에 맞는 모든 엔티티를 사용할 수 있습니다. <br />
+다음은 닫혀 있는 모든 버그를 조회하는 예제입니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$bugs</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">getRepository</span><span class="p">(</span><span class="s1">&#39;Bug&#39;</span><span class="p">)</span>
                       <span class="o">-&gt;</span><span class="na">findBy</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;status&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;CLOSED&#39;</span><span class="p">));</span>
@@ -1357,11 +1263,9 @@ example querying for all closed bugs:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Compared to DQL these query methods are falling short of functionality very fast.
-Doctrine offers you a convenient way to extend the functionalities of the default <code class="docutils literal"><span class="pre">EntityRepository</span></code>
-and put all the specialized DQL query logic on it. For this you have to create a subclass
-of <code class="docutils literal"><span class="pre">Doctrine\ORM\EntityRepository</span></code>, in our case a <code class="docutils literal"><span class="pre">BugRepository</span></code> and group all
-the previously discussed query functionality in it:</p>
+<p>DQL과 비교해 볼 때, 이 조회 메소드는 짧고, 빠릅니다. <br />
+독트린은 기본 <code class="docutils literal"><span class="pre">EntityRepository</span></code>(엔티티 저장소)의 기능을 확장할 수 있는 편리한 방법을 제공하rh 모든 전문 DQL 쿼리 로직을 집어 넣었습니다. <br />
+이걸 위해서는 <code class="docutils literal"><span class="pre">Doctrine\ORM\EntityRepository</span></code>의 서브 클래스를 만들어야 하는데, 우리의 경우에는 <code class="docutils literal"><span class="pre">BugRepository</span></code> 라는 이름을 붙여서 앞에서 검토한 쿼리 기능들을 묶어보겠습니다. </p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// src/BugRepository.php</span>
 
@@ -1407,8 +1311,7 @@ the previously discussed query functionality in it:</p>
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>To be able to use this query logic through <code class="docutils literal"><span class="pre">$this-&gt;getEntityManager()-&gt;getRepository('Bug')</span></code>
-we have to adjust the metadata slightly.</p>
+<p>이 쿼리 로직이 <code class="docutils literal"><span class="pre">$this-&gt;getEntityManager()-&gt;getRepository('Bug')</span></code>를 사용할 수 있도록 메타데이터를 약간 수정합니다.</p>
 <div class="configuration-block">
 <ul class="simple">
 <li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
@@ -1443,8 +1346,9 @@ we have to adjust the metadata slightly.</p>
 </li>
 </ul>
 </div>
-<p>Now we can remove our query logic in all the places and instead use them through the EntityRepository.
-As an example here is the code of the first use case &#8220;List of Bugs&#8221;:</p>
+<p>이제 모든 곳에서 쿼리 로직을 지우고, 대신 엔티티 저장소로 그것을 사용합니다. <br />
+다음은 첫 사용 예제 "버그 목록" 의 샘플 코드입니다.
+</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// list_bugs_repository.php</span>
 <span class="k">require_once</span> <span class="s2">&quot;bootstrap.php&quot;</span><span class="p">;</span>
@@ -1462,11 +1366,11 @@ As an example here is the code of the first use case &#8220;List of Bugs&#8221;:
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Using EntityRepositories you can avoid coupling your model with specific query logic.
-You can also re-use query logic easily throughout your application.</p>
-<p>The method <code class="docutils literal"><span class="pre">count()</span></code> takes an array of fields or association keys and the values to match against.
-This provides you with a convenient and lightweight way to count a resultset when you don&#8217;t need to
-deal with it:</p>
+<p>엔티티저장소를 사용하면, 특정 쿼리 로직과 모델이 합쳐지는 것을 막을 수 있습니다. <br />
+또한 애플리케이션 전체에 걸쳐 쿼리 로직을 쉽게 재사용할 수 있습니다.</p>
+<p><code class="docutils literal"><span class="pre">count()</span></code> 메소드는 필드나 연결 키와 그에 해당하는 값을 받습니다. <br />
+이 메소드는, 별다른 옵션이 필요 없을 경우에, 쉽고 가볍게, 결과셋의 개수를 가져올 수 있습니다. 
+</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="nv">$productCount</span> <span class="o">=</span> <span class="nv">$entityManager</span><span class="o">-&gt;</span><span class="na">getRepository</span><span class="p">(</span><span class="nx">Product</span><span class="o">::</span><span class="na">class</span><span class="p">)</span>
                          <span class="o">-&gt;</span><span class="na">count</span><span class="p">([</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="nv">$productName</span><span class="p">]);</span>
@@ -1474,16 +1378,15 @@ deal with it:</p>
 </div>
 </div>
 <div class="section" id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>This tutorial is over here, I hope you had fun. Additional content
-will be added to this tutorial incrementally, topics will include:</p>
+<h2>결론<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>이번 튜토리얼은 여기까지 입니다. 재밌었기를 바랍니다. <br />
+이 튜토리얼 이후로 계속 다음의 컨텐츠가 추가될 예정입니다. </p>
 <ul class="simple">
-<li>More on Association Mappings</li>
-<li>Lifecycle Events triggered in the UnitOfWork</li>
-<li>Ordering of Collections</li>
+<li>참조 매핑에 대한 더 많은 점</li>
+<li>UnitOfWork의 라이프 사이클 이벤트 트리거</li>
+<li>컬렉션 정렬</li>
 </ul>
-<p>Additional details on all the topics discussed here can be found in
-the respective manual chapters.</p>
+<p>여기서 설명된 모든 항목들의 별도 상세 설명은 각 메뉴얼 챕터에서 찾으실 수 있습니다.</p>
 </div>
 </div>
 

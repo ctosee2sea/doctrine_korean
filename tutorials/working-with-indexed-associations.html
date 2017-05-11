@@ -114,38 +114,35 @@ READTHEDOCS_DATA['source_suffix'] = '.rst'
               <div class="body" >
                 
   <div class="section" id="working-with-indexed-associations">
-<h1>Working with Indexed Associations<a class="headerlink" href="#working-with-indexed-associations" title="Permalink to this headline">¶</a></h1>
+<h1>인덱싱된 연결 작업<a class="headerlink" href="#working-with-indexed-associations" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">This feature is scheduled for version 2.1 of Doctrine and not included in the 2.0.x series.</p>
+<p class="last">이 기능은 독트린 2.1 버젼에 예정되어 있습니다. 2.0.x 버젼에는 포함되어 있지 않습니다.</p>
 </div>
-<p>Doctrine 2 collections are modelled after PHPs native arrays. PHP arrays are an ordered hashmap, but in
-the first version of Doctrine keys retrieved from the database were always numerical unless <code class="docutils literal"><span class="pre">INDEX</span> <span class="pre">BY</span></code>
-was used. Starting with Doctrine 2.1 you can index your collections by a value in the related entity.
-This is a first step towards full ordered hashmap support through the Doctrine ORM.
-The feature works like an implicit <code class="docutils literal"><span class="pre">INDEX</span> <span class="pre">BY</span></code> for the selected association but has several
-downsides also:</p>
+<p>독트린 2 컬렉션은 PHP의 네이티브 배열로 모델링됩니다. <br />
+PHP 배열은 해쉬맵으로 정렬되지만, 독트린 첫 번째 버젼에서는 데이터베이스에서 검색된 키들이 <code class="docutils literal"><span class="pre">INDEX</span> <span class="pre">BY</span></code>가 사용되지 않는 한 항상 숫자였습니다. <br />
+독트린 2.1부터 관련 엔티티 값으로 컬렉션을 인덱싱 할 수 있습니다. <br />
+독트린 ORM이 완전한 해쉬맵 정렬을 지원하기 위한 첫 단계입니다. <br />
+이 기능은 select된 연결로 <code class="docutils literal"><span class="pre">INDEX</span> <span class="pre">BY</span></code> 한 것과 비슷하지만, 여기에도 몇 가지 단점이 있습니다.</p>
 <ul class="simple">
-<li>You have to manage both the key and field if you want to change the index by field value.</li>
-<li>On each request the keys are regenerated from the field value not from the previous collection key.</li>
-<li>Values of the Index-By keys are never considered during persistence, it only exists for accessing purposes.</li>
-<li>Fields that are used for the index by feature <strong>HAVE</strong> to be unique in the database. The behavior for multiple entities
-with the same index-by field value is undefined.</li>
+<li>필드 값으로 색인을 변경하려면 키와 필드 모두 관리 해야 합니다.</li>
+<li>요청을 할 때, 키들은 이전의 컬렉션 키가 아닌 필드 값에서 다시 재생성 됩니다.</li>
+<li>Index-By 키의 값들은 영속성을 띄는 동안 고려되지 않으며, 오로지 접근을 위해서만 존재합니다.</li>
+<li>기능별로 인덱스에 사용되는 필드는 <strong>반드시</strong> 데이터베이스에서 유일해야 합니다. 같은 index-by 필드 값을 갖는 다중 엔티티의 동작은 정의되지 않습니다.</li>
 </ul>
-<p>As an example we will design a simple stock exchange list view. The domain consists of the entity <code class="docutils literal"><span class="pre">Stock</span></code>
-and <code class="docutils literal"><span class="pre">Market</span></code> where each Stock has a symbol and is traded on a single market. Instead of having a numerical
-list of stocks traded on a market they will be indexed by their symbol, which is unique across all markets.</p>
+<p>우리는 예제로 간단한 주식 거래 목록 뷰를 만들겁니다. <br />
+<code class="docutils literal"><span class="pre">Stock</span></code>과 <code class="docutils literal"><span class="pre">Market</span></code> 엔티티를 도메인으로 사용할 겁니다. 각 Stock은 1개의 심볼을 갖고, 1개의 Market에서 거래될 수 있습니다. 시작에서 거래되는 주식의 숫자 목록 대신, 모든 시장을 통틀어 고유한 심볼로 인덱싱 될 겁니다.</p>
 <div class="section" id="mapping-indexed-associations">
-<h2>Mapping Indexed Associations<a class="headerlink" href="#mapping-indexed-associations" title="Permalink to this headline">¶</a></h2>
-<p>You can map indexed associations by adding:</p>
+<h2>인덱싱된 연결 매핑<a class="headerlink" href="#mapping-indexed-associations" title="Permalink to this headline">¶</a></h2>
+<p>다음을 추가하여 색인된 연결을 매핑할 수 있습니다.</p>
 <blockquote>
 <div><ul class="simple">
-<li><code class="docutils literal"><span class="pre">indexBy</span></code> attribute to any <code class="docutils literal"><span class="pre">&#64;OneToMany</span></code> or <code class="docutils literal"><span class="pre">&#64;ManyToMany</span></code> annotation.</li>
-<li><code class="docutils literal"><span class="pre">index-by</span></code> attribute to any <code class="docutils literal"><span class="pre">&lt;one-to-many</span> <span class="pre">/&gt;</span></code> or <code class="docutils literal"><span class="pre">&lt;many-to-many</span> <span class="pre">/&gt;</span></code> xml element.</li>
-<li><code class="docutils literal"><span class="pre">indexBy:</span></code> key-value pair to any association defined in <code class="docutils literal"><span class="pre">manyToMany:</span></code> or <code class="docutils literal"><span class="pre">oneToMany:</span></code> YAML mapping files.</li>
+<li><code class="docutils literal"><span class="pre">indexBy</span></code> 속성을 아무 <code class="docutils literal"><span class="pre">&#64;OneToMany</span></code> 나 <code class="docutils literal"><span class="pre">&#64;ManyToMany</span></code> 주석에 추가합니다. </li>
+<li><code class="docutils literal"><span class="pre">index-by</span></code> 속성을 아무 <code class="docutils literal"><span class="pre">&lt;one-to-many</span> <span class="pre">/&gt;</span></code> 나 <code class="docutils literal"><span class="pre">&lt;many-to-many</span> <span class="pre">/&gt;</span></code> xml 엘리멘트에 추가합니다. </li>
+<li><code class="docutils literal"><span class="pre">indexBy:</span></code> 키-값 쌍을  아무 <code class="docutils literal"><span class="pre">manyToMany:</span></code> 나 <code class="docutils literal"><span class="pre">oneToMany:</span></code> YAML 매핑 파일에 추가합니다.</li>
 </ul>
 </div></blockquote>
-<p>The code and mappings for the Market entity looks like this:</p>
+<p>Market 엔티티 코드와 매핑은 다음과 같습니다.</p>
 <div class="configuration-block">
 <ul class="simple">
 <li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
@@ -254,11 +251,10 @@ list of stocks traded on a market they will be indexed by their symbol, which is
 </li>
 </ul>
 </div>
-<p>Inside the <code class="docutils literal"><span class="pre">addStock()</span></code> method you can see how we directly set the key of the association to the symbol,
-so that we can work with the indexed association directly after invoking <code class="docutils literal"><span class="pre">addStock()</span></code>. Inside <code class="docutils literal"><span class="pre">getStock($symbol)</span></code>
-we pick a stock traded on the particular market by symbol. If this stock doesn&#8217;t exist an exception is thrown.</p>
-<p>The <code class="docutils literal"><span class="pre">Stock</span></code> entity doesn&#8217;t contain any special instructions that are new, but for completeness
-here are the code and mappings for it:</p>
+<p><code class="docutils literal"><span class="pre">addStock()</span></code> 메소드 내부에서 어떻게 연결키를 심볼에 직접 세팅하는지 볼 수 있습니다. <code class="docutils literal"><span class="pre">addStock()</span></code> 호출 후에 직접 인덱싱된 연결을 사용하여 작업할 수 있습니다. <br />
+<code class="docutils literal"><span class="pre">getStock($symbol)</span></code> 내부에서는 특정 Market에서 거래된 Stock을 심볼로 선택합니다.  <br />
+이 Stock이 없으면 예외를 발생시킵니다.</p>
+<p><code class="docutils literal"><span class="pre">Stock</span></code> 엔티티에는 특별히 새로운 지시 사항이 없습니다. 다음 코드는 매핑을 위한 완성된 코드 입니다.</p>
 <div class="configuration-block">
 <ul class="simple">
 <li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
@@ -343,10 +339,9 @@ here are the code and mappings for it:</p>
 </div>
 </div>
 <div class="section" id="querying-indexed-associations">
-<h2>Querying indexed associations<a class="headerlink" href="#querying-indexed-associations" title="Permalink to this headline">¶</a></h2>
-<p>Now that we defined the stocks collection to be indexed by symbol we can take a look at some code,
-that makes use of the indexing.</p>
-<p>First we will populate our database with two example stocks traded on a single market:</p>
+<h2>인덱싱된 연결 조회<a class="headerlink" href="#querying-indexed-associations" title="Permalink to this headline">¶</a></h2>
+<p>Stock 콜렉션을 심볼로 인덱싱 되도록 정의했습니다. <br /> 이제 인덱싱을 사용하는 코드를 보겠습니다.</p>
+<p>이제 우리의 데이터베이스에 1개의 Market에서 거래되는 2개의 샘플 Stock 을 넣어보죠.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// $em is the EntityManager</span>
 
@@ -360,8 +355,8 @@ that makes use of the indexing.</p>
 <span class="nv">$em</span><span class="o">-&gt;</span><span class="na">flush</span><span class="p">();</span>
 </pre></div>
 </div>
-<p>This code is not particular interesting since the indexing feature is not yet used. In a new request we could
-now query for the market:</p>
+<p>아직 인덱싱 기능을 사용하기 전에는, 이 코드는 특별할 것이 없습니다. <br />
+새로운 요청으로 Market을 조회해보겠습니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// $em is the EntityManager</span>
 <span class="nv">$marketId</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -375,9 +370,9 @@ now query for the market:</p>
 <span class="k">echo</span> <span class="nv">$stock</span><span class="o">-&gt;</span><span class="na">getSymbol</span><span class="p">();</span> <span class="c1">// will print &quot;AAPL&quot;</span>
 </pre></div>
 </div>
-<p>The implementation <code class="docutils literal"><span class="pre">Market::addStock()</span></code> in combination with <code class="docutils literal"><span class="pre">indexBy</span></code> allows to access the collection
-consistently by the Stock symbol. It does not matter if Stock is managed by Doctrine or not.</p>
-<p>The same applies to DQL queries: The <code class="docutils literal"><span class="pre">indexBy</span></code> configuration acts as implicit &#8220;INDEX BY&#8221; to a join association.</p>
+<p><code class="docutils literal"><span class="pre">indexBy</span></code>와 결합된 <code class="docutils literal"><span class="pre">Market::addStock()</span></code>을 실행하면, 항상 Stock 심볼로 컬렉션에 접근할 수 있게 합니다. <br />
+Stock이 독트린으로 관리되는지 여부와 관계 없습니다.</p>
+<p>DQL 쿼리에도 동일하게 적용할 수 있습니다. <code class="docutils literal"><span class="pre">indexBy</span></code> 설정은 사실상 join 관계에서의 "INDEX BY" 역할을 합니다.</p>
 <div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
 <span class="c1">// $em is the EntityManager</span>
 <span class="nv">$marketId</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
@@ -394,15 +389,14 @@ consistently by the Stock symbol. It does not matter if Stock is managed by Doct
 <span class="k">echo</span> <span class="nv">$stock</span><span class="o">-&gt;</span><span class="na">getSymbol</span><span class="p">();</span> <span class="c1">// will print &quot;AAPL&quot;</span>
 </pre></div>
 </div>
-<p>If you want to use <code class="docutils literal"><span class="pre">INDEX</span> <span class="pre">BY</span></code> explicitly on an indexed association you are free to do so. Additionally
-indexed associations also work with the <code class="docutils literal"><span class="pre">Collection::slice()</span></code> functionality, no matter if marked as
-LAZY or EXTRA_LAZY.</p>
+<p>인덱싱된 연결에서 <code class="docutils literal"><span class="pre">INDEX</span> <span class="pre">BY</span></code>를 명시적으로 사용하려면, 자유롭게 사용할 수 있습니다. <br />
+그리고 인덱싱된 연결은 LAZY 나 EXTRA_LAZY 라고 표시되어 있어도 관계 없이 <code class="docutils literal"><span class="pre">Collection::slice()</span></code> 기능과 함께 작동합니다. </p>
 </div>
 <div class="section" id="outlook-into-the-future">
 <h2>Outlook into the Future<a class="headerlink" href="#outlook-into-the-future" title="Permalink to this headline">¶</a></h2>
-<p>For the inverse side of a many-to-many associations there will be a way to persist the keys and the order
-as a third and fourth parameter into the join table. This feature is discussed in <a class="reference external" href="http://www.doctrine-project.org/jira/browse/DDC-213">DDC-213</a>
-This feature cannot be implemented for One-To-Many associations, because they are never the owning side.</p>
+<p>다:다(多:多 Many-to-Many) 연결의 참조되는 쪽을 사용하기 위해서, 키와 정렬을 3번째, 4번째 패러미터로 조인 테이블에 유지 시키는 기능이 생길 겁니다. <br />
+이 기능은 <a class="reference external" href="http://www.doctrine-project.org/jira/browse/DDC-213">DDC-213</a> 에서 검토 중입니다. <br />
+이 기능은 1:다(1:多 One-To-Many)에서는 구현할 수 없는데, 왜냐면 이건 참조하는 쪽이 될 수 없기 때문입니다.</p>
 </div>
 </div>
 

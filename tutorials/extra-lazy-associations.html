@@ -114,43 +114,41 @@ READTHEDOCS_DATA['source_suffix'] = '.rst'
               <div class="body" >
                 
   <div class="section" id="extra-lazy-associations">
-<h1>Extra Lazy Associations<a class="headerlink" href="#extra-lazy-associations" title="Permalink to this headline">¶</a></h1>
+<h1>별도의 지연 연결 (Extra Lazy Associations)<a class="headerlink" href="#extra-lazy-associations" title="Permalink to this headline">¶</a></h1>
 <div class="versionadded">
-<p><span class="versionmodified">New in version 2.1.</span></p>
+<p><span class="versionmodified">2.1. 버젼의 새 기능</span></p>
 </div>
-<p>In many cases associations between entities can get pretty large. Even in a simple scenario like a blog.
-where posts can be commented, you always have to assume that a post draws hundreds of comments.
-In Doctrine 2.0 if you accessed an association it would always get loaded completely into memory. This
-can lead to pretty serious performance problems, if your associations contain several hundreds or thousands
-of entities.</p>
-<p>With Doctrine 2.1 a feature called <strong>Extra Lazy</strong> is introduced for associations. Associations
-are marked as <strong>Lazy</strong> by default, which means the whole collection object for an association is populated
-the first time its accessed. If you mark an association as extra lazy the following methods on collections
-can be called without triggering a full load of the collection:</p>
+<p>많은 경우 엔티티의 연관성이 상당히 커질 수 있습니다. <br />
+블로그 같은 간단한 시나리오라도, 댓글 기능을 만들때는 수백개의 댓글이 달려 있을 수 있다고 추정하고 작업해야 합니다. <br />
+독트린 2.0에서 연결에 접근할 때, 언제나 메모리에 완전히 로드 됩니다. <br />
+그런데 만약 수백, 수천개의 엔티티를 연결하려고 하면 정말 큰 성능 문제가 발생할 수 있습니다. </p>
+<p>독트린 2.1에는 <strong>Extra Lazy</strong>이라 불리는 연결 기능이 추가 되었습니다. <br />
+연결은 기본적으로 <strong>Lazy</strong> 표시 붙어 있기 때문에, 연결을 위한 전체 콜렉션 객체는 처음 접근할 때 로드됩니다. <br />
+
+컬렉션에서 다음 메소드를 사용하여 연결에 Extra Lazy 표시를 하면, 컬렉션의 전체 로딩 되는일 없이 호출할 수 있습니다.</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">Collection#contains($entity)</span></code></li>
-<li><code class="docutils literal"><span class="pre">Collection#containsKey($key)</span></code> (available with Doctrine 2.5)</li>
+<li><code class="docutils literal"><span class="pre">Collection#containsKey($key)</span></code> (독트린 2.5)</li>
 <li><code class="docutils literal"><span class="pre">Collection#count()</span></code></li>
-<li><code class="docutils literal"><span class="pre">Collection#get($key)</span></code>  (available with Doctrine 2.4)</li>
+<li><code class="docutils literal"><span class="pre">Collection#get($key)</span></code>  (독트린 2.4)</li>
 <li><code class="docutils literal"><span class="pre">Collection#slice($offset,</span> <span class="pre">$length</span> <span class="pre">=</span> <span class="pre">null)</span></code></li>
 </ul>
-<p>For each of the above methods the following semantics apply:</p>
+<p>위의 각 메소드에는 다음 내용이 적용됩니다.</p>
 <ul class="simple">
-<li>For each call, if the Collection is not yet loaded, issue a straight SELECT statement against the database.</li>
-<li>For each call, if the collection is already loaded, fallback to the default functionality for lazy collections. No additional SELECT statements are executed.</li>
+<li>컬렉션이 로드되기 전이라면, 각 호출 시 데이터베이스에 대한 SELECT 문을 직접 발급합니다. </li>
+<li>컬렉션이 이미 로드된 후라면, 지연 컬렉션 기본 기능으로 대체됩니다. <br />
+추가 SELECT문은 실행되지 않습니다.</li>
 </ul>
-<p>Additionally even with Doctrine 2.0 the following methods do not trigger the collection load:</p>
+<p>독트린 2.0에서도 다음 메소드들은 컬렉션 로딩으로 이어지지 않습니다.</p>
 <ul class="simple">
 <li><code class="docutils literal"><span class="pre">Collection#add($entity)</span></code></li>
-<li><code class="docutils literal"><span class="pre">Collection#offsetSet($key,</span> <span class="pre">$entity)</span></code> - ArrayAccess with no specific key <code class="docutils literal"><span class="pre">$coll[]</span> <span class="pre">=</span> <span class="pre">$entity</span></code>, it does
-not work when setting specific keys like <code class="docutils literal"><span class="pre">$coll[0]</span> <span class="pre">=</span> <span class="pre">$entity</span></code>.</li>
+<li><code class="docutils literal"><span class="pre">Collection#offsetSet($key,</span> <span class="pre">$entity)</span></code> - <code class="docutils literal"><span class="pre">$coll[]</span> <span class="pre">=</span> <span class="pre">$entity</span></code> 처럼 특정키가 없는 Array접근을 하면 <code class="docutils literal"><span class="pre">$coll[0]</span> <span class="pre">=</span> <span class="pre">$entity</span></code>같은 특정키를 설정할 때 작동하지 않습니다.</li>
 </ul>
-<p>With extra lazy collections you can now not only add entities to large collections but also paginate them
-easily using a combination of <code class="docutils literal"><span class="pre">count</span></code> and <code class="docutils literal"><span class="pre">slice</span></code>.</p>
+<p>별도의 지연 컬렉션을 사용하면, 대규모 컬렉션에 엔티티를 추가할 수 있을 뿐 아니라, 쉽게 <code class="docutils literal"><span class="pre">count</span></code> 와 <code class="docutils literal"><span class="pre">slice</span></code>를 조합하여 페이지로 나눌 수 있습니다.</p>
 <div class="section" id="enabling-extra-lazy-associations">
-<h2>Enabling Extra-Lazy Associations<a class="headerlink" href="#enabling-extra-lazy-associations" title="Permalink to this headline">¶</a></h2>
-<p>The mapping configuration is simple. Instead of using the default value of <code class="docutils literal"><span class="pre">fetch=&quot;LAZY&quot;</span></code> you have to
-switch to extra lazy as shown in these examples:</p>
+<h2>별도의 지연 연결 활성화<a class="headerlink" href="#enabling-extra-lazy-associations" title="Permalink to this headline">¶</a></h2>
+<p>매핑 구성은 간단합니다.  <br />
+<code class="docutils literal"><span class="pre">fetch=&quot;LAZY&quot;</span></code>의 기본값 대신, 아래 예제에서 볼 수 있는 것처럼 extra lazy 라고 변경해 주면 됩니다.</p>
 <div class="configuration-block">
 <ul class="simple">
 <li><em>PHP</em><div class="highlight-php"><div class="highlight"><pre><span></span><span class="cp">&lt;?php</span>
